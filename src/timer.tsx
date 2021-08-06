@@ -6,6 +6,9 @@ interface ITimerStates {
   routine: any[];
   currentSet: number;
   mountCountdown: boolean;
+  globalRests: boolean;
+  activityForm: boolean;
+  individualRest: boolean;
 }
 
 //this component will handle the user input and will pass main data, sets (id, label and time)
@@ -17,11 +20,16 @@ export default class Timer extends React.Component<{}, ITimerStates> {
       routine: [], //array of objects: {id, label, time}
       currentSet: 0, //A set is an element of the routine array, this specify the set which will be sent to the countdown
       mountCountdown: false, //if true will mount the 'Countdown' component
+
+      globalRests: false,
+      activityForm: false,
+      individualRest: false,
     };
 
     this.handleUserInput = this.handleUserInput.bind(this);
     this.startCountdown = this.startCountdown.bind(this);
     this.nextSet = this.nextSet.bind(this);
+    this.handleToggleFieldset = this.handleToggleFieldset.bind(this);
 
     this.labelRef = React.createRef();
     this.timeRef = React.createRef();
@@ -92,6 +100,28 @@ export default class Timer extends React.Component<{}, ITimerStates> {
     return;
   }
 
+  handleToggleFieldset(field: string) {
+    switch (field) {
+      case 'globalRests':
+        this.setState({
+          globalRests: !this.state.globalRests,
+        });
+        break;
+      case 'activityForm':
+        this.setState({
+          activityForm: !this.state.activityForm,
+        });
+        break;
+      case 'individualRest':
+        this.setState({
+          individualRest: !this.state.individualRest,
+        });
+        break;
+      default:
+        break;
+    }
+  }
+
   render() {
     //holds the countdown component and it's assigned on each 'currentSet' change
     const timtim = (
@@ -104,17 +134,107 @@ export default class Timer extends React.Component<{}, ITimerStates> {
     );
 
     return (
-      <div>
-        Interval timer app
-        <form onSubmit={this.handleUserInput}>
-          <label>
-            insert time
-            <input type='text' ref={this.labelRef} />
-            <input type='text' ref={this.timeRef} />
+      <div className='w-full max-w-xl m-auto'>
+        <header className='flex justify-between items-center'>
+          <h1>Interval timer</h1>
+          <button
+            className='font-bold text-white py-2 px-4 rounded-md bg-gradient-to-r from-mint to-lime'
+            onClick={() => this.startCountdown()}
+          >
+            Start timer
+          </button>
+        </header>
+        <form className='w-full flex flex-col'>
+          <label className='text-lg flex justify-between my-2'>
+            <h2>Repetir descansos</h2>
+            <input
+              type='checkbox'
+              onChange={() => this.handleToggleFieldset('globalRests')}
+              defaultChecked={this.state.globalRests}
+            />
           </label>
-          <button type='submit'>add activity</button>
+          {this.state.globalRests && (
+            <fieldset className='flex items-end mb-2'>
+              <label className='flex flex-col flex-1'>
+                Tiempo
+                <input type='text' className='form-input mt-1 mr-2' />
+              </label>
+              <select className='form-select flex-none'>
+                <option value='sec'>sec</option>
+                <option value='min'>min</option>
+              </select>
+            </fieldset>
+          )}
         </form>
-        <button onClick={() => this.startCountdown()}>start</button>
+        <hr className='w-9/12 m-auto' />
+        <button
+          className='font-bold block w-3/5 text-white py-2 px-4 m-auto my-2 rounded-md bg-gray-600'
+          onClick={() => this.handleToggleFieldset('activityForm')}
+        >
+          New activity
+        </button>
+        {this.state.activityForm && (
+          <div className='absolute top-0 left-0 w-full h-full'>
+            <div
+              className='absolute top-0 left-0 w-full h-full bg-gray-50 bg-opacity-30'
+              onClick={() => this.handleToggleFieldset('activityForm')}
+            ></div>
+            <form
+              className='bg-gray-900 p-2 rounded-md absolute top-1/2 left-1/2 transform -translate-y-1/2 -translate-x-1/2'
+              onSubmit={this.handleUserInput}
+            >
+              <h2>Activity</h2>
+              <fieldset>
+                <label className='flex flex-col'>
+                  Name
+                  <input
+                    type='text'
+                    className='form-input mt-1'
+                    ref={this.labelRef}
+                  />
+                </label>
+              </fieldset>
+              <fieldset className='flex items-end mb-2'>
+                <label className='flex flex-col flex-1'>
+                  Tiempo
+                  <input type='text' className='form-input mt-1 mr-2' />
+                </label>
+                <select className='form-select flex-none'>
+                  <option value='sec'>sec</option>
+                  <option value='min'>min</option>
+                </select>
+              </fieldset>
+              <fieldset>
+                <label className='flex justify-between mt-1 '>
+                  <h2>Descanso</h2>
+                  <input
+                    type='checkbox'
+                    onChange={() => this.handleToggleFieldset('individualRest')}
+                    defaultChecked={this.state.individualRest}
+                  />
+                </label>
+                {this.state.individualRest && (
+                  <span className='flex items-end mb-2'>
+                    <label className='flex flex-col flex-1'>
+                      Tiempo
+                      <input type='text' className='form-input mt-1' />
+                    </label>
+                    <select className='form-select ml-2'>
+                      <option value='sec'>sec</option>
+                      <option value='min'>min</option>
+                    </select>
+                  </span>
+                )}
+              </fieldset>
+              <button
+                className='font-bold text-white block w-3/5 py-2 px-4 m-auto rounded-md bg-gradient-to-r from-mint to-lime'
+                type='submit'
+              >
+                Add set
+              </button>
+            </form>
+          </div>
+        )}
         {this.state.mountCountdown && <div>{timtim}</div>}
       </div>
     );

@@ -6,10 +6,27 @@
 
 @layer base {
   body {
-    @apply bg-gray-700 text-gray-50;
+    @apply bg-gray-800 text-gray-50 m-2 font-sans;
   }
-
+  h1 {
+    @apply text-2xl font-bold;
+  }
+  h2 {
+    @apply text-lg font-bold;
+  }
   input {
+    @apply text-gray-900 bg-gray-50;
+  }
+  select {
     @apply text-gray-900;
+  }
+}
+
+@layer components {
+  .form-input {
+    @apply px-2 py-1 border-gray-400 rounded-md;
+  }
+  .form-select {
+    @apply py-1 border-gray-400 rounded-md;
   }
 }

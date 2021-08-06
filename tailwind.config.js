@@ -7,6 +7,9 @@ module.exports = {
   theme: {
     colors: {
       gray: colors.trueGray,
+      white: '#ffffff',
+      mint: '#0BD986',
+      lime: '#0BE651',
     },
     extend: {
       fontFamily: {
@@ -17,5 +20,5 @@ module.exports = {
   variants: {
     extend: {},
   },
-  plugins: [],
+  plugins: [require('@tailwindcss/forms')({ strategy: 'class' })],
 };
