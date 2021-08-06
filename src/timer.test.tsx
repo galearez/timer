@@ -7,8 +7,3 @@ test('renders learn react link', () => {
   const linkElement = screen.getByText(/He He/i);
   expect(linkElement).toBeInTheDocument();
 });
-
-test('counts down', () => {
-  const wrapper = new Timer(60);
-  expect(wrapper.countdown(5)).toBe(false);
-});
