@@ -1,5 +1,7 @@
 import React from 'react';
 
+//useful info: https://dev.to/jackherizsmith/making-a-progress-circle-in-react-3o65
+
 interface ICountdownProps {
   //set label
   label: string;

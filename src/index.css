@@ -29,4 +29,31 @@
   .form-select {
     @apply py-1 border-gray-400 rounded-md;
   }
+  .toggle-switch {
+    @apply w-12 h-6 inline-block relative;
+  }
+  .toggle-switch input {
+    @apply w-0 h-0 opacity-0;
+  }
+  .slider {
+    @apply bg-gray-300 absolute top-0 right-0 bottom-0 left-0  transition-colors duration-500 cursor-pointer;
+    border-radius: 35px;
+  }
+  .slider::before {
+    position: absolute;
+    content: '';
+    width: 20px;
+    height: 20px;
+    bottom: 2px;
+    left: 2px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+  }
+  .toggle-switch input:checked + .slider {
+    @apply bg-mint;
+  }
+  .toggle-switch input:checked + .slider::before {
+    transform: translateX(24px);
+  }
 }

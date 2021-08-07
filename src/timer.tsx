@@ -8,12 +8,16 @@ interface ITimerStates {
   mountCountdown: boolean;
   globalRests: boolean;
   activityForm: boolean;
-  individualRest: boolean;
+  singleRest: boolean;
+  screenWidth: number;
 }
 
 //this component will handle the user input and will pass main data, sets (id, label and time)
 //to the other components
 export default class Timer extends React.Component<{}, ITimerStates> {
+  //get intial first screen width
+  screenWidth: number = window.innerWidth;
+
   constructor(props: any) {
     super(props);
     this.state = {
@@ -21,15 +25,23 @@ export default class Timer extends React.Component<{}, ITimerStates> {
       currentSet: 0, //A set is an element of the routine array, this specify the set which will be sent to the countdown
       mountCountdown: false, //if true will mount the 'Countdown' component
 
+      //will control the form to auto generate rests between rounds
       globalRests: false,
-      activityForm: false,
-      individualRest: false,
+      //will control the form to include a new round, the initial value will depend on the initial screen size,
+      //the responsive design render the form by default when the app is on a screen over 767 (md in tailwind)
+      activityForm: this.screenWidth > 767,
+      //will control the form to include a single rest after a round
+      singleRest: false,
+
+      //initial screenWidth, will update on screen resize
+      screenWidth: this.screenWidth,
     };
 
     this.handleUserInput = this.handleUserInput.bind(this);
     this.startCountdown = this.startCountdown.bind(this);
     this.nextSet = this.nextSet.bind(this);
     this.handleToggleFieldset = this.handleToggleFieldset.bind(this);
+    this.handleScreenResize = this.handleScreenResize.bind(this);
 
     this.labelRef = React.createRef();
     this.timeRef = React.createRef();
@@ -38,6 +50,37 @@ export default class Timer extends React.Component<{}, ITimerStates> {
   //user input box references
   labelRef: React.RefObject<HTMLInputElement>;
   timeRef: React.RefObject<HTMLInputElement>;
+
+  //when screen resize it will be called to change the screenWidth state which control some responsive rendering
+  handleScreenResize() {
+    this.setState({ screenWidth: window.innerWidth }, () => {
+      //if the user expands the screen over 767 it will open the activity form component
+      if (this.state.screenWidth > 767 && !this.state.activityForm) {
+        this.setState({
+          activityForm: true,
+        });
+        return;
+      }
+
+      //if the user shrinks the screen below 768 it will close the activity form component
+      if (this.state.screenWidth < 768 && this.state.activityForm) {
+        this.setState({
+          activityForm: false,
+        });
+        return;
+      }
+    });
+  }
+
+  //once it gets mounted waits for any resize
+  componentDidMount() {
+    window.addEventListener('resize', this.handleScreenResize);
+  }
+
+  //unmount the window resize event listener
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.handleScreenResize);
+  }
 
   //this function get the values from the user and assign them to the routine state
   handleUserInput(event: React.FormEvent<HTMLFormElement>) {
@@ -100,6 +143,9 @@ export default class Timer extends React.Component<{}, ITimerStates> {
     return;
   }
 
+  //this function will handle all the fields where the input can add data, they will only be rendered
+  //once the user need them in mobile, in screens > 768, they will be rendered by default and the only
+  //conditional rendering will be the other components
   handleToggleFieldset(field: string) {
     switch (field) {
       case 'globalRests':
@@ -112,9 +158,9 @@ export default class Timer extends React.Component<{}, ITimerStates> {
           activityForm: !this.state.activityForm,
         });
         break;
-      case 'individualRest':
+      case 'singleRest':
         this.setState({
-          individualRest: !this.state.individualRest,
+          singleRest: !this.state.singleRest,
         });
         break;
       default:
@@ -134,8 +180,8 @@ export default class Timer extends React.Component<{}, ITimerStates> {
     );
 
     return (
-      <div className='w-full max-w-xl m-auto'>
-        <header className='flex justify-between items-center'>
+      <div className='w-full max-w-xl md:max-w-4xl m-auto md:grid grid-cols-2 gap-x-4'>
+        <header className='flex justify-between items-center col-span-2'>
           <h1>Interval timer</h1>
           <button
             className='font-bold text-white py-2 px-4 rounded-md bg-gradient-to-r from-mint to-lime'
@@ -144,17 +190,20 @@ export default class Timer extends React.Component<{}, ITimerStates> {
             Start timer
           </button>
         </header>
-        <form className='w-full flex flex-col'>
-          <label className='text-lg flex justify-between my-2'>
+        <form className='w-full flex flex-col col-start-1'>
+          <fieldset className='text-lg mt-2 flex justify-between items-center'>
             <h2>Repetir descansos</h2>
-            <input
-              type='checkbox'
-              onChange={() => this.handleToggleFieldset('globalRests')}
-              defaultChecked={this.state.globalRests}
-            />
-          </label>
+            <label className='toggle-switch'>
+              <input
+                type='checkbox'
+                onChange={() => this.handleToggleFieldset('globalRests')}
+                defaultChecked={this.state.globalRests}
+              />
+              <span className='slider'></span>
+            </label>
+          </fieldset>
           {this.state.globalRests && (
-            <fieldset className='flex items-end mb-2'>
+            <fieldset className='flex items-end'>
               <label className='flex flex-col flex-1'>
                 Tiempo
                 <input type='text' className='form-input mt-1 mr-2' />
@@ -166,21 +215,21 @@ export default class Timer extends React.Component<{}, ITimerStates> {
             </fieldset>
           )}
         </form>
-        <hr className='w-9/12 m-auto' />
+        <hr className='w-9/12 m-auto mt-2 md:my-2 col-start-1' />
         <button
-          className='font-bold block w-3/5 text-white py-2 px-4 m-auto my-2 rounded-md bg-gray-600'
+          className='font-bold block md:hidden w-3/5 text-white py-2 px-4 m-auto my-2 rounded-md bg-gray-600'
           onClick={() => this.handleToggleFieldset('activityForm')}
         >
           New activity
         </button>
         {this.state.activityForm && (
-          <div className='absolute top-0 left-0 w-full h-full'>
+          <div className='absolute md:relative top-0 left-0 w-full h-full col-start-1'>
             <div
-              className='absolute top-0 left-0 w-full h-full bg-gray-50 bg-opacity-30'
+              className='absolute md:hidden top-0 left-0 w-full h-full bg-gray-50 bg-opacity-30'
               onClick={() => this.handleToggleFieldset('activityForm')}
             ></div>
             <form
-              className='bg-gray-900 p-2 rounded-md absolute top-1/2 left-1/2 transform -translate-y-1/2 -translate-x-1/2'
+              className='bg-gray-800 p-2 md:p-0 rounded-md absolute md:relative top-1/2 left-1/2 md:top-auto md:left-auto transform -translate-y-1/2 -translate-x-1/2 md:transform-none'
               onSubmit={this.handleUserInput}
             >
               <h2>Activity</h2>
@@ -197,23 +246,30 @@ export default class Timer extends React.Component<{}, ITimerStates> {
               <fieldset className='flex items-end mb-2'>
                 <label className='flex flex-col flex-1'>
                   Tiempo
-                  <input type='text' className='form-input mt-1 mr-2' />
+                  <input
+                    type='text'
+                    ref={this.timeRef}
+                    className='form-input mt-1 mr-2'
+                  />
                 </label>
                 <select className='form-select flex-none'>
                   <option value='sec'>sec</option>
                   <option value='min'>min</option>
                 </select>
               </fieldset>
-              <fieldset>
-                <label className='flex justify-between mt-1 '>
-                  <h2>Descanso</h2>
+              <span className='mt-1 flex justify-between items-center'>
+                <h2>Descanso</h2>
+                <label className='toggle-switch '>
                   <input
                     type='checkbox'
-                    onChange={() => this.handleToggleFieldset('individualRest')}
-                    defaultChecked={this.state.individualRest}
+                    onChange={() => this.handleToggleFieldset('singleRest')}
+                    defaultChecked={this.state.singleRest}
                   />
+                  <span className='slider'></span>
                 </label>
-                {this.state.individualRest && (
+              </span>
+              <fieldset>
+                {this.state.singleRest && (
                   <span className='flex items-end mb-2'>
                     <label className='flex flex-col flex-1'>
                       Tiempo
@@ -227,15 +283,17 @@ export default class Timer extends React.Component<{}, ITimerStates> {
                 )}
               </fieldset>
               <button
-                className='font-bold text-white block w-3/5 py-2 px-4 m-auto rounded-md bg-gradient-to-r from-mint to-lime'
                 type='submit'
+                className='font-bold text-white block w-3/5 py-2 px-4 m-auto rounded-md bg-gradient-to-r from-mint to-lime'
               >
                 Add set
               </button>
             </form>
           </div>
         )}
-        {this.state.mountCountdown && <div>{timtim}</div>}
+        {this.state.mountCountdown && (
+          <div className='row-span-6'>{timtim}</div>
+        )}
       </div>
     );
   }
