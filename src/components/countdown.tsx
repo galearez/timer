@@ -8,14 +8,16 @@ interface ICountdownProps {
   //set time
   time: number;
   //this method indicates that the next 'set' should run and unmount this component
-  nextSetIndex: () => void;
+  nextRoundIndex: () => void;
   //once this component is unmounted this method will mount the next one (if there is one) right after this unmounts
-  mountNextSet: () => void;
+  mountnextRound: () => void;
 }
 
 interface ICountdownState {
   //will hold the remaining time
   countdownTime: number;
+  minutes: number;
+  seconds: number;
 }
 
 export default class Countdown extends React.Component<
@@ -27,6 +29,8 @@ export default class Countdown extends React.Component<
 
     this.state = {
       countdownTime: this.props.time,
+      minutes: Math.floor(this.props.time / 60),
+      seconds: this.props.time % 60,
     };
   }
 
@@ -39,24 +43,30 @@ export default class Countdown extends React.Component<
     this.interval = setInterval(() => {
       if (this.state.countdownTime <= 0) {
         clearInterval(this.interval);
-        this.props.nextSetIndex();
+        this.props.nextRoundIndex();
       }
 
       this.setState({
         countdownTime: this.state.countdownTime - 1,
+        minutes: Math.floor(this.state.countdownTime / 60),
+        seconds: this.state.countdownTime % 60,
       });
     }, 1000);
   }
 
   componentWillUnmount() {
-    this.props.mountNextSet();
+    this.props.mountnextRound();
   }
 
   render() {
     return (
       <div>
-        {this.props.label}
-        <span>{this.state.countdownTime}</span>
+        <div>{this.props.label}</div>
+        <div>
+          <span>{this.state.minutes}</span>
+          {':'}
+          <span>{this.state.seconds}</span>
+        </div>
       </div>
     );
   }

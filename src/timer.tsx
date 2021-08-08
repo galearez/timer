@@ -4,15 +4,17 @@ import Countdown from './components/countdown';
 //this interface define the timer component states types
 interface ITimerStates {
   routine: any[];
-  currentSet: number;
+  currentRound: number;
   mountCountdown: boolean;
   globalRests: boolean;
   activityForm: boolean;
   singleRest: boolean;
   screenWidth: number;
+  minRest: number;
+  secRest: number;
 }
 
-//this component will handle the user input and will pass main data, sets (id, label and time)
+//this component will handle the user input and will pass main data, rounds (id, label and time)
 //to the other components
 export default class Timer extends React.Component<{}, ITimerStates> {
   //get intial first screen width
@@ -22,7 +24,7 @@ export default class Timer extends React.Component<{}, ITimerStates> {
     super(props);
     this.state = {
       routine: [], //array of objects: {id, label, time}
-      currentSet: 0, //A set is an element of the routine array, this specify the set which will be sent to the countdown
+      currentRound: 0, //A round is an element of the routine array, this specify the round which will be sent to the countdown
       mountCountdown: false, //if true will mount the 'Countdown' component
 
       //will control the form to auto generate rests between rounds
@@ -35,21 +37,38 @@ export default class Timer extends React.Component<{}, ITimerStates> {
 
       //initial screenWidth, will update on screen resize
       screenWidth: this.screenWidth,
+
+      //since there are two ways to define a rest, we are goind to define state for their values
+      minRest: 0,
+      secRest: 0,
     };
 
     this.handleUserInput = this.handleUserInput.bind(this);
     this.startCountdown = this.startCountdown.bind(this);
-    this.nextSet = this.nextSet.bind(this);
+    this.nextRound = this.nextRound.bind(this);
     this.handleToggleFieldset = this.handleToggleFieldset.bind(this);
     this.handleScreenResize = this.handleScreenResize.bind(this);
 
+    this.handleMinRestChange = this.handleMinRestChange.bind(this);
+    this.handleSecRestChange = this.handleSecRestChange.bind(this);
+
     this.labelRef = React.createRef();
-    this.timeRef = React.createRef();
+    this.roundMinRef = React.createRef();
+    this.roundSecRef = React.createRef();
+    this.restMinRef = React.createRef();
+    this.restSecRef = React.createRef();
   }
 
   //user input box references
   labelRef: React.RefObject<HTMLInputElement>;
-  timeRef: React.RefObject<HTMLInputElement>;
+  roundMinRef: React.RefObject<HTMLSelectElement>;
+  roundSecRef: React.RefObject<HTMLSelectElement>;
+  restMinRef: React.RefObject<HTMLSelectElement>;
+  restSecRef: React.RefObject<HTMLSelectElement>;
+
+  //this will help to auto-generate the options in the select boxes
+  oneToSixtyArray: number[] = [];
+  fiveByFiveArray: number[] = [];
 
   //when screen resize it will be called to change the screenWidth state which control some responsive rendering
   handleScreenResize() {
@@ -74,6 +93,14 @@ export default class Timer extends React.Component<{}, ITimerStates> {
 
   //once it gets mounted waits for any resize
   componentDidMount() {
+    for (let i = 0; i <= 60; i++) {
+      this.oneToSixtyArray.push(i);
+    }
+
+    for (let i = 0; i <= 12; i++) {
+      this.fiveByFiveArray.push(i * 5);
+    }
+
     window.addEventListener('resize', this.handleScreenResize);
   }
 
@@ -86,39 +113,67 @@ export default class Timer extends React.Component<{}, ITimerStates> {
   handleUserInput(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    //check if the user wrote a valid string as the set label, if not it will be assigned a default name
+    //check if the user wrote a valid string as the round label, if not it will be assigned a default name
     let inputLabel = this.labelRef.current?.value;
     if (inputLabel === '' || inputLabel === undefined) {
       inputLabel = 'actividad'; //default name if the user don't specify one
     }
 
-    //check if the user inserted a valid string as the set time
-    let inputTime = this.timeRef.current?.value;
-    if (inputTime === '' || inputTime === undefined) {
+    //This block of code it's very ugly find a way to make it look beautiful
+    let inputMin = this.roundMinRef.current?.value;
+    let inputSec = this.roundSecRef.current?.value;
+    let inputRestMin = this.restMinRef.current?.value;
+    let inputRestSec = this.restSecRef.current?.value;
+    if (
+      inputMin === undefined ||
+      inputSec === undefined ||
+      inputRestMin === undefined ||
+      inputRestSec === undefined
+    ) {
       return;
     }
 
-    //check if set time is an integer number
-    const timeNumeric = parseInt(inputTime);
-    if (isNaN(timeNumeric)) {
+    //convert the string values to numbers
+    const timeActivityMin = parseInt(inputMin);
+    const timeActivitySec = parseInt(inputSec);
+    const timeRestMin = parseInt(inputRestMin);
+    const timeRestSec = parseInt(inputRestSec);
+
+    //convert the activity time to seconds
+    const timeActivity = timeActivityMin * 60 + timeActivitySec;
+    const timeRest = timeRestMin * 60 + timeRestSec;
+
+    //if there is no time for an activity it will not create a routine round
+    if (timeActivity === 0) {
       return;
     }
 
     //only the values that met the conditions will be assigned to the user routine
     //label must be a valid string
-    //time must be a valid integer number
+    //time must be an integer between 0 and 60
     this.setState((prevState) => ({
-      routine: [...prevState.routine, { label: inputLabel, time: timeNumeric }],
+      routine: [
+        ...prevState.routine,
+        { label: inputLabel, time: timeActivity },
+      ],
     }));
+
+    //add a rest after the round if the user has one of the add Rest switch enabled, this is like this
+    //because that way the user can turn off the global rest if they don't need it between rounds
+    if (this.state.singleRest) {
+      this.setState((prevState) => ({
+        routine: [...prevState.routine, { label: 'Rest', time: timeRest }],
+      }));
+    }
   }
 
-  //this function will set which 'set' should run, also a change indicates that the current interval
+  //this function will set which 'round' should run, also a change indicates that the current interval
   //it's done executing so the next one should run, that why we also pass a callback, this callback
   //unmount the component that just has finished
-  nextSet() {
+  nextRound() {
     this.setState(
       {
-        currentSet: this.state.currentSet + 1,
+        currentRound: this.state.currentRound + 1,
       },
       () => {
         this.setState({
@@ -130,11 +185,11 @@ export default class Timer extends React.Component<{}, ITimerStates> {
 
   //this function will start a countdown, can be used in two cases:
   //first, the user click in start timer
-  //second, one countdown reach zero, unmounts and if there is another set it will mount the component again for the new set
+  //second, one countdown reach zero, unmounts and if there is another round it will mount the component again for the new round
   startCountdown() {
     //this condition checks if there are elements in the routine array to
     //run a countdown, if so the component 'Countdown' will be mounted
-    if (this.state.currentSet < this.state.routine.length) {
+    if (this.state.currentRound < this.state.routine.length) {
       this.setState({
         mountCountdown: true,
       });
@@ -151,6 +206,7 @@ export default class Timer extends React.Component<{}, ITimerStates> {
       case 'globalRests':
         this.setState({
           globalRests: !this.state.globalRests,
+          singleRest: !this.state.singleRest,
         });
         break;
       case 'activityForm':
@@ -168,16 +224,59 @@ export default class Timer extends React.Component<{}, ITimerStates> {
     }
   }
 
+  //handle global rest select value
+  handleMinRestChange(e: any) {
+    this.setState({
+      minRest: e.target.value,
+    });
+  }
+
+  //handle global rest select value
+  handleSecRestChange(e: any) {
+    this.setState({
+      secRest: e.target.value,
+    });
+  }
+
   render() {
-    //holds the countdown component and it's assigned on each 'currentSet' change
-    const timtim = (
+    //creates options for the minutes select box
+    const sixtyOptions = this.oneToSixtyArray.map((elem: number) => (
+      <option value={elem}>{elem}</option>
+    ));
+
+    //create options for the seconds select box
+    const twelveOptions = this.fiveByFiveArray.map((elem: number) => (
+      <option value={elem}>{elem}</option>
+    ));
+
+    //holds the countdown component and it's assigned on each 'currentRound' change
+    const countdownComponent = (
       <Countdown
-        label={this.state.routine[this.state.currentSet]?.label}
-        time={this.state.routine[this.state.currentSet]?.time}
-        nextSetIndex={this.nextSet}
-        mountNextSet={this.startCountdown}
+        label={this.state.routine[this.state.currentRound]?.label}
+        time={this.state.routine[this.state.currentRound]?.time}
+        nextRoundIndex={this.nextRound}
+        mountnextRound={this.startCountdown}
       />
     );
+
+    //prueba a ver si se añaden los valores correctamente
+    const activitiesList = this.state.routine.map((elem: any) => {
+      const minutes = Math.floor(elem.time / 60);
+      const seconds = elem.time % 60;
+
+      return (
+        <div>
+          <div className='w-full p-2 rounded-lg flex justify-between items-center flex-nowrap text-lg'>
+            <span>{elem.label}</span>
+            <span>
+              {minutes < 10 ? <span>0{minutes}</span> : <span>{minutes}</span>}:
+              {seconds < 10 ? <span>0{seconds}</span> : <span>{seconds}</span>}
+            </span>
+          </div>
+          <hr className='w-9/12 m-auto my-2 md:my-2 col-start-1' />
+        </div>
+      );
+    });
 
     return (
       <div className='w-full max-w-xl md:max-w-4xl m-auto md:grid grid-cols-2 gap-x-4'>
@@ -204,21 +303,42 @@ export default class Timer extends React.Component<{}, ITimerStates> {
           </fieldset>
           {this.state.globalRests && (
             <fieldset className='flex items-end'>
-              <label className='flex flex-col flex-1'>
-                Tiempo
-                <input type='text' className='form-input mt-1 mr-2' />
+              <label className='flex flex-col flex-1 mr-1'>
+                Minutes
+                <select
+                  value={this.state.minRest}
+                  className='form-select flex-none'
+                  onChange={this.handleMinRestChange}
+                  disabled={!this.state.globalRests}
+                >
+                  {sixtyOptions}
+                </select>
               </label>
-              <select className='form-select flex-none'>
-                <option value='sec'>sec</option>
-                <option value='min'>min</option>
-              </select>
+              <label className='flex flex-col flex-1'>
+                Seconds
+                <select
+                  value={this.state.secRest}
+                  className='form-select flex-none'
+                  onChange={this.handleSecRestChange}
+                  disabled={!this.state.globalRests}
+                >
+                  {twelveOptions}
+                </select>
+              </label>
             </fieldset>
           )}
         </form>
         <hr className='w-9/12 m-auto mt-2 md:my-2 col-start-1' />
         <button
           className='font-bold block md:hidden w-3/5 text-white py-2 px-4 m-auto my-2 rounded-md bg-gray-600'
-          onClick={() => this.handleToggleFieldset('activityForm')}
+          onClick={() => {
+            this.handleToggleFieldset('activityForm');
+            if (this.state.globalRests) {
+              this.setState({
+                singleRest: true,
+              });
+            }
+          }}
         >
           New activity
         </button>
@@ -229,7 +349,7 @@ export default class Timer extends React.Component<{}, ITimerStates> {
               onClick={() => this.handleToggleFieldset('activityForm')}
             ></div>
             <form
-              className='bg-gray-800 p-2 md:p-0 rounded-md absolute md:relative top-1/2 left-1/2 md:top-auto md:left-auto transform -translate-y-1/2 -translate-x-1/2 md:transform-none'
+              className='bg-gray-800 w-11/12 md:w-full p-2 md:p-0 rounded-md absolute md:relative top-1/2 left-1/2 md:top-auto md:left-auto transform -translate-y-1/2 -translate-x-1/2 md:transform-none'
               onSubmit={this.handleUserInput}
             >
               <h2>Activity</h2>
@@ -244,55 +364,87 @@ export default class Timer extends React.Component<{}, ITimerStates> {
                 </label>
               </fieldset>
               <fieldset className='flex items-end mb-2'>
+                <label className='flex flex-col flex-1 mr-1'>
+                  Minutes
+                  <select
+                    className='form-select flex-none'
+                    ref={this.roundMinRef}
+                  >
+                    {sixtyOptions}
+                  </select>
+                </label>
                 <label className='flex flex-col flex-1'>
-                  Tiempo
-                  <input
-                    type='text'
-                    ref={this.timeRef}
-                    className='form-input mt-1 mr-2'
-                  />
+                  Seconds
+                  <select
+                    className='form-select flex-none'
+                    ref={this.roundSecRef}
+                  >
+                    {twelveOptions}
+                  </select>
                 </label>
-                <select className='form-select flex-none'>
-                  <option value='sec'>sec</option>
-                  <option value='min'>min</option>
-                </select>
               </fieldset>
-              <span className='mt-1 flex justify-between items-center'>
-                <h2>Descanso</h2>
-                <label className='toggle-switch '>
-                  <input
-                    type='checkbox'
-                    onChange={() => this.handleToggleFieldset('singleRest')}
-                    defaultChecked={this.state.singleRest}
-                  />
-                  <span className='slider'></span>
-                </label>
-              </span>
-              <fieldset>
-                {this.state.singleRest && (
-                  <span className='flex items-end mb-2'>
-                    <label className='flex flex-col flex-1'>
-                      Tiempo
-                      <input type='text' className='form-input mt-1' />
-                    </label>
-                    <select className='form-select ml-2'>
-                      <option value='sec'>sec</option>
-                      <option value='min'>min</option>
+              <fieldset className='bg-gray-700 mb-2 px-1 rounded-md'>
+                <span className='mt-1 flex justify-between items-center'>
+                  <h2>Descanso</h2>
+                  <label className='toggle-switch '>
+                    <input
+                      type='checkbox'
+                      onChange={() => this.handleToggleFieldset('singleRest')}
+                      defaultChecked={this.state.singleRest}
+                    />
+                    <span className='slider'></span>
+                  </label>
+                </span>
+                <span className='flex items-end mb-2'>
+                  <label className='flex flex-col flex-1 mr-1'>
+                    Minutes
+                    <select
+                      className='form-select flex-none'
+                      ref={this.restMinRef}
+                      disabled={!this.state.singleRest}
+                    >
+                      {sixtyOptions}
                     </select>
-                  </span>
-                )}
+                  </label>
+                  <label className='flex flex-col flex-1'>
+                    Seconds
+                    <select
+                      className='form-select flex-none'
+                      ref={this.restSecRef}
+                      disabled={!this.state.singleRest}
+                    >
+                      {twelveOptions}
+                    </select>
+                  </label>
+                </span>
               </fieldset>
               <button
                 type='submit'
                 className='font-bold text-white block w-3/5 py-2 px-4 m-auto rounded-md bg-gradient-to-r from-mint to-lime'
               >
-                Add set
+                Add round
               </button>
             </form>
           </div>
         )}
+        {activitiesList}
         {this.state.mountCountdown && (
-          <div className='row-span-6'>{timtim}</div>
+          <div className='row-span-6'>
+            {countdownComponent}
+            {this.state.routine[this.state.currentRound + 1] && (
+              <div className='md:hidden'>
+                <h2>Next round</h2>
+                <div className='flex justify-between'>
+                  <span>
+                    {this.state.routine[this.state.currentRound]?.label}
+                  </span>
+                  <span>
+                    {this.state.routine[this.state.currentRound]?.time}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
         )}
       </div>
     );
