@@ -1,5 +1,11 @@
 import React from 'react';
 import Countdown from './components/countdown';
+import { v4 as uuidv4 } from 'uuid';
+
+//Style the nextRound componet to see what is next
+//Style the countdown component and hide everything else when mounted
+//Add delete and move buttons to activities
+//Add buttons to stop the countdown, restart an activity and modify the routine
 
 //this interface define the timer component states types
 interface ITimerStates {
@@ -66,6 +72,9 @@ export default class Timer extends React.Component<{}, ITimerStates> {
   restMinRef: React.RefObject<HTMLSelectElement>;
   restSecRef: React.RefObject<HTMLSelectElement>;
 
+  //variable to keep track of the activities, just for activities default names
+  roundDefaultNumber: number = 1;
+
   //this will help to auto-generate the options in the select boxes
   oneToSixtyArray: number[] = [];
   fiveByFiveArray: number[] = [];
@@ -91,8 +100,8 @@ export default class Timer extends React.Component<{}, ITimerStates> {
     });
   }
 
-  //once it gets mounted waits for any resize
   componentDidMount() {
+    //once mounted generate arrays with the options for the select boxes, I'm lazy
     for (let i = 0; i <= 60; i++) {
       this.oneToSixtyArray.push(i);
     }
@@ -101,6 +110,7 @@ export default class Timer extends React.Component<{}, ITimerStates> {
       this.fiveByFiveArray.push(i * 5);
     }
 
+    //once it gets mounted waits for any resize
     window.addEventListener('resize', this.handleScreenResize);
   }
 
@@ -116,8 +126,10 @@ export default class Timer extends React.Component<{}, ITimerStates> {
     //check if the user wrote a valid string as the round label, if not it will be assigned a default name
     let inputLabel = this.labelRef.current?.value;
     if (inputLabel === '' || inputLabel === undefined) {
-      inputLabel = 'actividad'; //default name if the user don't specify one
+      inputLabel = 'Round ' + this.roundDefaultNumber; //default name if the user don't specify one
     }
+
+    this.roundDefaultNumber++;
 
     //This block of code it's very ugly find a way to make it look beautiful
     let inputMin = this.roundMinRef.current?.value;
@@ -154,7 +166,7 @@ export default class Timer extends React.Component<{}, ITimerStates> {
     this.setState((prevState) => ({
       routine: [
         ...prevState.routine,
-        { label: inputLabel, time: timeActivity },
+        { id: uuidv4(), label: inputLabel, time: timeActivity },
       ],
     }));
 
@@ -162,9 +174,16 @@ export default class Timer extends React.Component<{}, ITimerStates> {
     //because that way the user can turn off the global rest if they don't need it between rounds
     if (this.state.singleRest) {
       this.setState((prevState) => ({
-        routine: [...prevState.routine, { label: 'Rest', time: timeRest }],
+        routine: [
+          ...prevState.routine,
+          { id: uuidv4(), label: 'Rest', time: timeRest },
+        ],
       }));
     }
+
+    this.setState({
+      activityForm: false,
+    });
   }
 
   //this function will set which 'round' should run, also a change indicates that the current interval
@@ -241,12 +260,16 @@ export default class Timer extends React.Component<{}, ITimerStates> {
   render() {
     //creates options for the minutes select box
     const sixtyOptions = this.oneToSixtyArray.map((elem: number) => (
-      <option value={elem}>{elem}</option>
+      <option value={elem} key={elem}>
+        {elem}
+      </option>
     ));
 
     //create options for the seconds select box
     const twelveOptions = this.fiveByFiveArray.map((elem: number) => (
-      <option value={elem}>{elem}</option>
+      <option value={elem} key={elem}>
+        {elem}
+      </option>
     ));
 
     //holds the countdown component and it's assigned on each 'currentRound' change
@@ -259,13 +282,13 @@ export default class Timer extends React.Component<{}, ITimerStates> {
       />
     );
 
-    //prueba a ver si se añaden los valores correctamente
+    //this variable is meant to render the routine
     const activitiesList = this.state.routine.map((elem: any) => {
       const minutes = Math.floor(elem.time / 60);
       const seconds = elem.time % 60;
 
       return (
-        <div>
+        <div key={elem.id}>
           <div className='w-full p-2 rounded-lg flex justify-between items-center flex-nowrap text-lg'>
             <span>{elem.label}</span>
             <span>
