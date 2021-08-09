@@ -2,8 +2,8 @@ import React from 'react';
 import Countdown from './components/countdown';
 import { v4 as uuidv4 } from 'uuid';
 
-//Style the nextRound componet to see what is next
 //Style the countdown component and hide everything else when mounted
+//Style the nextRound componet to see what is next
 //Add delete and move buttons to activities
 //Add buttons to stop the countdown, restart an activity and modify the routine
 
@@ -16,8 +16,10 @@ interface ITimerStates {
   activityForm: boolean;
   singleRest: boolean;
   screenWidth: number;
-  minRest: number;
-  secRest: number;
+  minGlobalRest: number;
+  secGlobalRest: number;
+  minSingleRest: number;
+  secSingleRest: number;
 }
 
 //this component will handle the user input and will pass main data, rounds (id, label and time)
@@ -45,8 +47,12 @@ export default class Timer extends React.Component<{}, ITimerStates> {
       screenWidth: this.screenWidth,
 
       //since there are two ways to define a rest, we are goind to define state for their values
-      minRest: 0,
-      secRest: 0,
+      minGlobalRest: 0,
+      secGlobalRest: 0,
+
+      //
+      minSingleRest: 0,
+      secSingleRest: 0,
     };
 
     this.handleUserInput = this.handleUserInput.bind(this);
@@ -55,8 +61,11 @@ export default class Timer extends React.Component<{}, ITimerStates> {
     this.handleToggleFieldset = this.handleToggleFieldset.bind(this);
     this.handleScreenResize = this.handleScreenResize.bind(this);
 
-    this.handleMinRestChange = this.handleMinRestChange.bind(this);
-    this.handleSecRestChange = this.handleSecRestChange.bind(this);
+    this.handleMinGlobalRestChange = this.handleMinGlobalRestChange.bind(this);
+    this.handleSecGlobalRestChange = this.handleSecGlobalRestChange.bind(this);
+
+    this.handleMinSingleRestChange = this.handleMinSingleRestChange.bind(this);
+    this.handleSecSingleRestChange = this.handleSecSingleRestChange.bind(this);
 
     this.labelRef = React.createRef();
     this.roundMinRef = React.createRef();
@@ -72,7 +81,7 @@ export default class Timer extends React.Component<{}, ITimerStates> {
   restMinRef: React.RefObject<HTMLSelectElement>;
   restSecRef: React.RefObject<HTMLSelectElement>;
 
-  //variable to keep track of the activities, just for activities default names
+  //variable to keep track of the number of rounds, just for rounds default names
   roundDefaultNumber: number = 1;
 
   //this will help to auto-generate the options in the select boxes
@@ -129,8 +138,6 @@ export default class Timer extends React.Component<{}, ITimerStates> {
       inputLabel = 'Round ' + this.roundDefaultNumber; //default name if the user don't specify one
     }
 
-    this.roundDefaultNumber++;
-
     //This block of code it's very ugly find a way to make it look beautiful
     let inputMin = this.roundMinRef.current?.value;
     let inputSec = this.roundSecRef.current?.value;
@@ -170,6 +177,9 @@ export default class Timer extends React.Component<{}, ITimerStates> {
       ],
     }));
 
+    //once a round is created it adds one to the counter
+    this.roundDefaultNumber++;
+
     //add a rest after the round if the user has one of the add Rest switch enabled, this is like this
     //because that way the user can turn off the global rest if they don't need it between rounds
     if (this.state.singleRest) {
@@ -180,6 +190,11 @@ export default class Timer extends React.Component<{}, ITimerStates> {
         ],
       }));
     }
+
+    this.setState({
+      minSingleRest: this.state.minGlobalRest,
+      secSingleRest: this.state.secGlobalRest,
+    });
 
     this.setState({
       activityForm: false,
@@ -244,16 +259,30 @@ export default class Timer extends React.Component<{}, ITimerStates> {
   }
 
   //handle global rest select value
-  handleMinRestChange(e: any) {
+  handleMinGlobalRestChange(e: any) {
     this.setState({
-      minRest: e.target.value,
+      minGlobalRest: e.target.value,
+      minSingleRest: e.target.value,
     });
   }
 
   //handle global rest select value
-  handleSecRestChange(e: any) {
+  handleSecGlobalRestChange(e: any) {
     this.setState({
-      secRest: e.target.value,
+      secGlobalRest: e.target.value,
+      secSingleRest: e.target.value,
+    });
+  }
+
+  handleMinSingleRestChange(e: any) {
+    this.setState({
+      minSingleRest: e.target.value,
+    });
+  }
+
+  handleSecSingleRestChange(e: any) {
+    this.setState({
+      secSingleRest: e.target.value,
     });
   }
 
@@ -329,9 +358,9 @@ export default class Timer extends React.Component<{}, ITimerStates> {
               <label className='flex flex-col flex-1 mr-1'>
                 Minutes
                 <select
-                  value={this.state.minRest}
+                  value={this.state.minGlobalRest}
                   className='form-select flex-none'
-                  onChange={this.handleMinRestChange}
+                  onChange={this.handleMinGlobalRestChange}
                   disabled={!this.state.globalRests}
                 >
                   {sixtyOptions}
@@ -340,9 +369,9 @@ export default class Timer extends React.Component<{}, ITimerStates> {
               <label className='flex flex-col flex-1'>
                 Seconds
                 <select
-                  value={this.state.secRest}
+                  value={this.state.secGlobalRest}
                   className='form-select flex-none'
-                  onChange={this.handleSecRestChange}
+                  onChange={this.handleSecGlobalRestChange}
                   disabled={!this.state.globalRests}
                 >
                   {twelveOptions}
@@ -383,6 +412,7 @@ export default class Timer extends React.Component<{}, ITimerStates> {
                     type='text'
                     className='form-input mt-1'
                     ref={this.labelRef}
+                    placeholder={'Round ' + this.roundDefaultNumber}
                   />
                 </label>
               </fieldset>
@@ -424,6 +454,8 @@ export default class Timer extends React.Component<{}, ITimerStates> {
                     <select
                       className='form-select flex-none'
                       ref={this.restMinRef}
+                      value={this.state.minSingleRest}
+                      onChange={this.handleMinSingleRestChange}
                       disabled={!this.state.singleRest}
                     >
                       {sixtyOptions}
@@ -434,6 +466,8 @@ export default class Timer extends React.Component<{}, ITimerStates> {
                     <select
                       className='form-select flex-none'
                       ref={this.restSecRef}
+                      value={this.state.secSingleRest}
+                      onChange={this.handleSecSingleRestChange}
                       disabled={!this.state.singleRest}
                     >
                       {twelveOptions}
