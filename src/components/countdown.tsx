@@ -61,8 +61,8 @@ export default class Countdown extends React.Component<
   render() {
     return (
       <div className='font-bold h-80 flex flex-col justify-center items-center'>
-        <div className=''>{this.props.label}</div>
-        <div className='text-8xl'>
+        <div className='text-2xl md:text-4xl'>{this.props.label}</div>
+        <div className='text-6xl md:text-8xl'>
           <span>
             {this.state.minutes < 10 ? (
               <span>0{this.state.minutes}</span>

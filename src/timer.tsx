@@ -2,7 +2,6 @@ import React from 'react';
 import Countdown from './components/countdown';
 import { v4 as uuidv4 } from 'uuid';
 
-//Style the nextRound componet to see what is next
 //Add delete and move buttons to activities
 //Add buttons to stop the countdown, restart an activity and modify the routine
 
@@ -340,14 +339,13 @@ export default class Timer extends React.Component<{}, ITimerStates> {
 
       return (
         <div key={elem.id}>
-          <div className='w-full p-2 rounded-lg flex justify-between items-center flex-nowrap text-lg'>
+          <div className='w-full bg-gray-700 rounded-md p-2 mb-2 flex justify-between items-center flex-nowrap text-lg'>
             <span>{elem.label}</span>
             <span>
               {minutes < 10 ? <span>0{minutes}</span> : <span>{minutes}</span>}:
               {seconds < 10 ? <span>0{seconds}</span> : <span>{seconds}</span>}
             </span>
           </div>
-          <hr className='w-9/12 m-auto' />
         </div>
       );
     });
@@ -475,8 +473,8 @@ export default class Timer extends React.Component<{}, ITimerStates> {
                   <label className='toggle-switch '>
                     <input
                       type='checkbox'
-                      onChange={() => this.handleToggleFieldset('singleRest')}
-                      defaultChecked={this.state.singleRest}
+                      onClick={() => this.handleToggleFieldset('singleRest')}
+                      checked={this.state.singleRest}
                     />
                     <span className='slider'></span>
                   </label>
@@ -517,11 +515,16 @@ export default class Timer extends React.Component<{}, ITimerStates> {
             </form>
           </div>
         )}
-        {
-          <div className='md:mt-2 pb-2 bg-gray-700 rounded-md col-start-1 md:col-start-2 md:row-start-2 md:row-span-4'>
+        {this.state.screenWidth < 768 && !this.state.closeHomeScreen && (
+          <div className='col-start-1 md:col-start-2 md:row-start-2 md:row-span-4'>
             {activitiesList}
           </div>
-        }
+        )}
+        {this.state.screenWidth > 767 && (
+          <div className='md:mt-2 col-start-1 md:col-start-2 md:row-start-2 md:row-span-4'>
+            {activitiesList}
+          </div>
+        )}
         {this.state.closeHomeScreen && (
           <div className='row-span-6'>
             {this.state.mountCountdown ? (
@@ -532,16 +535,9 @@ export default class Timer extends React.Component<{}, ITimerStates> {
               </div>
             )}
             {this.state.routine[this.state.currentRound + 1] && (
-              <div>
-                <h2>Next round</h2>
-                <div className='flex justify-between'>
-                  <span>
-                    {this.state.routine[this.state.currentRound]?.label}
-                  </span>
-                  <span>
-                    {this.state.routine[this.state.currentRound]?.time}
-                  </span>
-                </div>
+              <div className='bg-gray-700 rounded-md'>
+                <h2 className='pt-2 px-2'>Next round</h2>
+                {activitiesList[this.state.currentRound + 1]}
               </div>
             )}
           </div>
