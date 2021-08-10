@@ -2,7 +2,9 @@ import React from 'react';
 import Countdown from './components/countdown';
 import { v4 as uuidv4 } from 'uuid';
 
-//Add delete and move buttons to activities
+import { ReactComponent as MoreIcon } from './assets/delete.svg';
+
+//Add move button to activities
 //Add buttons to stop the countdown, restart an activity and modify the routine
 
 //this interface define the timer component states types
@@ -73,6 +75,8 @@ export default class Timer extends React.Component<{}, ITimerStates> {
 
     this.handleMinSingleRestChange = this.handleMinSingleRestChange.bind(this);
     this.handleSecSingleRestChange = this.handleSecSingleRestChange.bind(this);
+
+    this.handleDeleteRound = this.handleDeleteRound.bind(this);
 
     this.labelRef = React.createRef();
     this.roundMinRef = React.createRef();
@@ -307,6 +311,15 @@ export default class Timer extends React.Component<{}, ITimerStates> {
     });
   }
 
+  //this method will delete a round
+  handleDeleteRound(id: number) {
+    let updatedRoutine = this.state.routine.filter((elem) => elem.id !== id);
+
+    this.setState({
+      routine: updatedRoutine,
+    });
+  }
+
   render() {
     //creates options for the minutes select box
     const sixtyOptions = this.oneToSixtyArray.map((elem: number) => (
@@ -341,10 +354,29 @@ export default class Timer extends React.Component<{}, ITimerStates> {
         <div key={elem.id}>
           <div className='w-full bg-gray-700 rounded-md p-2 mb-2 flex justify-between items-center flex-nowrap text-lg'>
             <span>{elem.label}</span>
-            <span>
-              {minutes < 10 ? <span>0{minutes}</span> : <span>{minutes}</span>}:
-              {seconds < 10 ? <span>0{seconds}</span> : <span>{seconds}</span>}
-            </span>
+            <div className='flex items-center'>
+              <span>
+                {minutes < 10 ? (
+                  <span>0{minutes}</span>
+                ) : (
+                  <span>{minutes}</span>
+                )}
+                :
+                {seconds < 10 ? (
+                  <span>0{seconds}</span>
+                ) : (
+                  <span>{seconds}</span>
+                )}
+              </span>
+              <span
+                className='inline-block ml-3'
+                onClick={() => {
+                  this.handleDeleteRound(elem.id);
+                }}
+              >
+                <MoreIcon className='fill-current text-gray-50' />
+              </span>
+            </div>
           </div>
         </div>
       );
