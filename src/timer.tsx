@@ -2,7 +2,6 @@ import React from 'react';
 import Countdown from './components/countdown';
 import { v4 as uuidv4 } from 'uuid';
 
-//Style the countdown component and hide everything else when mounted
 //Style the nextRound componet to see what is next
 //Add delete and move buttons to activities
 //Add buttons to stop the countdown, restart an activity and modify the routine
@@ -20,6 +19,7 @@ interface ITimerStates {
   secGlobalRest: number;
   minSingleRest: number;
   secSingleRest: number;
+  closeHomeScreen: boolean;
 }
 
 //this component will handle the user input and will pass main data, rounds (id, label and time)
@@ -31,9 +31,15 @@ export default class Timer extends React.Component<{}, ITimerStates> {
   constructor(props: any) {
     super(props);
     this.state = {
-      routine: [], //array of objects: {id, label, time}
-      currentRound: 0, //A round is an element of the routine array, this specify the round which will be sent to the countdown
-      mountCountdown: false, //if true will mount the 'Countdown' component
+      //this state will control when the user input forms are active, basically when the countdown start
+      //the 'home' screen will be closed to give room for the countdown UI elements
+      closeHomeScreen: false,
+      //array of objects: {id, label, time}
+      routine: [],
+      //A round is an element of the routine array, this specify the round which will be sent to the countdown
+      currentRound: 0,
+      //if true will mount the 'Countdown' component
+      mountCountdown: false,
 
       //will control the form to auto generate rests between rounds
       globalRests: false,
@@ -46,16 +52,18 @@ export default class Timer extends React.Component<{}, ITimerStates> {
       //initial screenWidth, will update on screen resize
       screenWidth: this.screenWidth,
 
-      //since there are two ways to define a rest, we are goind to define state for their values
+      //since there are two ways to define a rest, we are goind to define state for their values, this state control
+      //the rest if the globalRest state is true
       minGlobalRest: 0,
       secGlobalRest: 0,
 
-      //
+      //this state are meant to control individual rests, since sometimes there will be different rests lengths
       minSingleRest: 0,
       secSingleRest: 0,
     };
 
     this.handleUserInput = this.handleUserInput.bind(this);
+    this.handleHomeClose = this.handleHomeClose.bind(this);
     this.startCountdown = this.startCountdown.bind(this);
     this.nextRound = this.nextRound.bind(this);
     this.handleToggleFieldset = this.handleToggleFieldset.bind(this);
@@ -191,14 +199,19 @@ export default class Timer extends React.Component<{}, ITimerStates> {
       }));
     }
 
+    //reset the values of the single rests, if there are global rests, they will be reset to that value, if not
+    //they will be reset to 0
     this.setState({
       minSingleRest: this.state.minGlobalRest,
       secSingleRest: this.state.secGlobalRest,
     });
 
-    this.setState({
-      activityForm: false,
-    });
+    //close the input form modal
+    if (this.state.screenWidth < 768) {
+      this.setState({
+        activityForm: false,
+      });
+    }
   }
 
   //this function will set which 'round' should run, also a change indicates that the current interval
@@ -217,7 +230,7 @@ export default class Timer extends React.Component<{}, ITimerStates> {
     );
   }
 
-  //this function will start a countdown, can be used in two cases:
+  //this function will start a countdown, is used in two cases:
   //first, the user click in start timer
   //second, one countdown reach zero, unmounts and if there is another round it will mount the component again for the new round
   startCountdown() {
@@ -232,6 +245,13 @@ export default class Timer extends React.Component<{}, ITimerStates> {
     return;
   }
 
+  //when the user start the countdown the first time it will unmount all the 'home screen' elements
+  handleHomeClose() {
+    this.setState({
+      closeHomeScreen: true,
+    });
+  }
+
   //this function will handle all the fields where the input can add data, they will only be rendered
   //once the user need them in mobile, in screens > 768, they will be rendered by default and the only
   //conditional rendering will be the other components
@@ -240,7 +260,7 @@ export default class Timer extends React.Component<{}, ITimerStates> {
       case 'globalRests':
         this.setState({
           globalRests: !this.state.globalRests,
-          singleRest: !this.state.singleRest,
+          singleRest: !this.state.globalRests,
         });
         break;
       case 'activityForm':
@@ -258,7 +278,7 @@ export default class Timer extends React.Component<{}, ITimerStates> {
     }
   }
 
-  //handle global rest select value
+  //handle global rest select value, and also single rests to show that they will be added
   handleMinGlobalRestChange(e: any) {
     this.setState({
       minGlobalRest: e.target.value,
@@ -266,7 +286,7 @@ export default class Timer extends React.Component<{}, ITimerStates> {
     });
   }
 
-  //handle global rest select value
+  //handle global rest select value, and also single rests to show that they will be added
   handleSecGlobalRestChange(e: any) {
     this.setState({
       secGlobalRest: e.target.value,
@@ -274,12 +294,14 @@ export default class Timer extends React.Component<{}, ITimerStates> {
     });
   }
 
+  //handle single rest select value
   handleMinSingleRestChange(e: any) {
     this.setState({
       minSingleRest: e.target.value,
     });
   }
 
+  //handle single rest select value
   handleSecSingleRestChange(e: any) {
     this.setState({
       secSingleRest: e.target.value,
@@ -325,7 +347,7 @@ export default class Timer extends React.Component<{}, ITimerStates> {
               {seconds < 10 ? <span>0{seconds}</span> : <span>{seconds}</span>}
             </span>
           </div>
-          <hr className='w-9/12 m-auto my-2 md:my-2 col-start-1' />
+          <hr className='w-9/12 m-auto' />
         </div>
       );
     });
@@ -334,67 +356,78 @@ export default class Timer extends React.Component<{}, ITimerStates> {
       <div className='w-full max-w-xl md:max-w-4xl m-auto md:grid grid-cols-2 gap-x-4'>
         <header className='flex justify-between items-center col-span-2'>
           <h1>Interval timer</h1>
-          <button
-            className='font-bold text-white py-2 px-4 rounded-md bg-gradient-to-r from-mint to-lime'
-            onClick={() => this.startCountdown()}
-          >
-            Start timer
-          </button>
+          {!this.state.closeHomeScreen && (
+            <button
+              className='font-bold text-white py-2 px-4 rounded-md bg-gradient-to-r from-mint to-lime'
+              onClick={() => {
+                this.startCountdown();
+                this.handleHomeClose();
+              }}
+            >
+              Start timer
+            </button>
+          )}
         </header>
-        <form className='w-full flex flex-col col-start-1'>
-          <fieldset className='text-lg mt-2 flex justify-between items-center'>
-            <h2>Repetir descansos</h2>
-            <label className='toggle-switch'>
-              <input
-                type='checkbox'
-                onChange={() => this.handleToggleFieldset('globalRests')}
-                defaultChecked={this.state.globalRests}
-              />
-              <span className='slider'></span>
-            </label>
-          </fieldset>
-          {this.state.globalRests && (
-            <fieldset className='flex items-end'>
-              <label className='flex flex-col flex-1 mr-1'>
-                Minutes
-                <select
-                  value={this.state.minGlobalRest}
-                  className='form-select flex-none'
-                  onChange={this.handleMinGlobalRestChange}
-                  disabled={!this.state.globalRests}
-                >
-                  {sixtyOptions}
-                </select>
-              </label>
-              <label className='flex flex-col flex-1'>
-                Seconds
-                <select
-                  value={this.state.secGlobalRest}
-                  className='form-select flex-none'
-                  onChange={this.handleSecGlobalRestChange}
-                  disabled={!this.state.globalRests}
-                >
-                  {twelveOptions}
-                </select>
+        {!this.state.closeHomeScreen && (
+          <form className='w-full md:mt-2 flex flex-col col-start-1'>
+            <fieldset className='text-lg mt-2 flex justify-between items-center'>
+              <h2>Repetir descansos</h2>
+              <label className='toggle-switch'>
+                <input
+                  type='checkbox'
+                  onChange={() => this.handleToggleFieldset('globalRests')}
+                  defaultChecked={this.state.globalRests}
+                />
+                <span className='slider'></span>
               </label>
             </fieldset>
-          )}
-        </form>
-        <hr className='w-9/12 m-auto mt-2 md:my-2 col-start-1' />
-        <button
-          className='font-bold block md:hidden w-3/5 text-white py-2 px-4 m-auto my-2 rounded-md bg-gray-600'
-          onClick={() => {
-            this.handleToggleFieldset('activityForm');
-            if (this.state.globalRests) {
-              this.setState({
-                singleRest: true,
-              });
-            }
-          }}
-        >
-          New activity
-        </button>
-        {this.state.activityForm && (
+            {this.state.globalRests && (
+              <fieldset className='flex items-end'>
+                <label className='flex flex-col flex-1 mr-1'>
+                  Minutes
+                  <select
+                    value={this.state.minGlobalRest}
+                    className='form-select flex-none'
+                    onChange={this.handleMinGlobalRestChange}
+                    disabled={!this.state.globalRests}
+                  >
+                    {sixtyOptions}
+                  </select>
+                </label>
+                <label className='flex flex-col flex-1'>
+                  Seconds
+                  <select
+                    value={this.state.secGlobalRest}
+                    className='form-select flex-none'
+                    onChange={this.handleSecGlobalRestChange}
+                    disabled={!this.state.globalRests}
+                  >
+                    {twelveOptions}
+                  </select>
+                </label>
+              </fieldset>
+            )}
+          </form>
+        )}
+        {!this.state.closeHomeScreen && (
+          <div>
+            <hr className='w-9/12 m-auto mt-2 md:my-2 col-start-1' />
+            <button
+              className='font-bold block md:hidden w-3/5 text-white py-2 px-4 m-auto my-2 rounded-md bg-gray-600'
+              onClick={() => {
+                this.handleToggleFieldset('activityForm');
+                if (this.state.globalRests) {
+                  this.setState({
+                    singleRest: true,
+                  });
+                }
+              }}
+            >
+              New activity
+            </button>
+          </div>
+        )}
+        {!this.state.closeHomeScreen && this.state.activityForm && (
           <div className='absolute md:relative top-0 left-0 w-full h-full col-start-1'>
             <div
               className='absolute md:hidden top-0 left-0 w-full h-full bg-gray-50 bg-opacity-30'
@@ -484,12 +517,22 @@ export default class Timer extends React.Component<{}, ITimerStates> {
             </form>
           </div>
         )}
-        {activitiesList}
-        {this.state.mountCountdown && (
+        {
+          <div className='md:mt-2 pb-2 bg-gray-700 rounded-md col-start-1 md:col-start-2 md:row-start-2 md:row-span-4'>
+            {activitiesList}
+          </div>
+        }
+        {this.state.closeHomeScreen && (
           <div className='row-span-6'>
-            {countdownComponent}
+            {this.state.mountCountdown ? (
+              countdownComponent
+            ) : (
+              <div className='font-bold text-4xl md:text-6xl h-80 flex flex-col justify-center items-center'>
+                Completed!
+              </div>
+            )}
             {this.state.routine[this.state.currentRound + 1] && (
-              <div className='md:hidden'>
+              <div>
                 <h2>Next round</h2>
                 <div className='flex justify-between'>
                   <span>

@@ -60,12 +60,22 @@ export default class Countdown extends React.Component<
 
   render() {
     return (
-      <div>
-        <div>{this.props.label}</div>
-        <div>
-          <span>{this.state.minutes}</span>
-          {':'}
-          <span>{this.state.seconds}</span>
+      <div className='font-bold h-80 flex flex-col justify-center items-center'>
+        <div className=''>{this.props.label}</div>
+        <div className='text-8xl'>
+          <span>
+            {this.state.minutes < 10 ? (
+              <span>0{this.state.minutes}</span>
+            ) : (
+              <span>{this.state.minutes}</span>
+            )}
+            :
+            {this.state.seconds < 10 ? (
+              <span>0{this.state.seconds}</span>
+            ) : (
+              <span>{this.state.seconds}</span>
+            )}
+          </span>
         </div>
       </div>
     );
