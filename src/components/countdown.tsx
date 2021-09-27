@@ -41,16 +41,16 @@ export default class Countdown extends React.Component<
   //the component and it will run until the 'countdownTime' is 0
   componentDidMount() {
     this.interval = setInterval(() => {
-      if (this.state.countdownTime <= 0) {
+      if (this.state.countdownTime < 0) {
         clearInterval(this.interval);
         this.props.nextRoundIndex();
+      } else {
+        this.setState({
+          countdownTime: this.state.countdownTime - 1,
+          minutes: Math.floor(this.state.countdownTime / 60),
+          seconds: this.state.countdownTime % 60,
+        });
       }
-
-      this.setState({
-        countdownTime: this.state.countdownTime - 1,
-        minutes: Math.floor(this.state.countdownTime / 60),
-        seconds: this.state.countdownTime % 60,
-      });
     }, 1000);
   }
 
