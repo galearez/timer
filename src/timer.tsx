@@ -16,6 +16,8 @@ interface ITimerStates {
   activityForm: boolean;
   singleRest: boolean;
   screenWidth: number;
+  roundMin: number;
+  roundSec: number;
   minGlobalRest: number;
   secGlobalRest: number;
   minSingleRest: number;
@@ -65,6 +67,11 @@ export default class Timer extends React.Component<{}, ITimerStates> {
       //initial screenWidth, will update on screen resize
       screenWidth: this.screenWidth,
 
+      //this states are ment to control the round time selects, this was add to restart the values after
+      //a round is submitted
+      roundMin: 0,
+      roundSec: 0,
+
       //since there are two ways to define a rest, we are goind to define state for their values, this state control
       //the rest if the globalRest state is true
       minGlobalRest: 0,
@@ -84,6 +91,9 @@ export default class Timer extends React.Component<{}, ITimerStates> {
 
     this.handleMinGlobalRestChange = this.handleMinGlobalRestChange.bind(this);
     this.handleSecGlobalRestChange = this.handleSecGlobalRestChange.bind(this);
+
+    this.handleRoundMinChange = this.handleRoundMinChange.bind(this);
+    this.handleRoundSecChange = this.handleRoundSecChange.bind(this);
 
     this.handleMinSingleRestChange = this.handleMinSingleRestChange.bind(this);
     this.handleSecSingleRestChange = this.handleSecSingleRestChange.bind(this);
@@ -206,6 +216,8 @@ export default class Timer extends React.Component<{}, ITimerStates> {
     this.setState({
       minSingleRest: this.state.minGlobalRest,
       secSingleRest: this.state.secGlobalRest,
+      roundMin: 0,
+      roundSec: 0,
     });
 
     //close the input form modal
@@ -293,6 +305,20 @@ export default class Timer extends React.Component<{}, ITimerStates> {
     this.setState({
       secGlobalRest: e.target.value,
       secSingleRest: e.target.value,
+    });
+  }
+
+  //handle round minutes
+  handleRoundMinChange(e: any) {
+    this.setState({
+      roundMin: e.target.value,
+    });
+  }
+
+  //handle round seconds
+  handleRoundSecChange(e: any) {
+    this.setState({
+      roundSec: e.target.value,
     });
   }
 
@@ -389,8 +415,12 @@ export default class Timer extends React.Component<{}, ITimerStates> {
             <button
               className='font-bold text-white py-2 px-4 rounded-md bg-gradient-to-r from-mint to-lime'
               onClick={() => {
-                this.startCountdown();
-                this.handleHomeClose();
+                if (this.state.routine.length !== 0) {
+                  this.startCountdown();
+                  this.handleHomeClose();
+                }
+
+                return;
               }}
             >
               Start timer
@@ -484,6 +514,8 @@ export default class Timer extends React.Component<{}, ITimerStates> {
                   <select
                     className='form-select flex-none'
                     ref={this.roundMinRef}
+                    onChange={this.handleRoundMinChange}
+                    value={this.state.roundMin}
                   >
                     {sixtyOptions}
                   </select>
@@ -493,6 +525,8 @@ export default class Timer extends React.Component<{}, ITimerStates> {
                   <select
                     className='form-select flex-none'
                     ref={this.roundSecRef}
+                    onChange={this.handleRoundSecChange}
+                    value={this.state.roundSec}
                   >
                     {twelveOptions}
                   </select>
@@ -567,7 +601,7 @@ export default class Timer extends React.Component<{}, ITimerStates> {
             )}
             {this.state.routine[this.state.currentRound + 1] && (
               <div className='bg-gray-700 rounded-md'>
-                <h2 className='pt-2 px-2'>Next round</h2>
+                <h2 className='pt-2 px-2'>Next</h2>
                 {activitiesList[this.state.currentRound + 1]}
               </div>
             )}
