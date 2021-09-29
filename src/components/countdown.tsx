@@ -1,6 +1,5 @@
 import React from 'react';
-
-//useful info: https://dev.to/jackherizsmith/making-a-progress-circle-in-react-3o65
+import Icons from './icons';
 
 interface ICountdownProps {
   //set label
@@ -8,9 +7,12 @@ interface ICountdownProps {
   //set time
   time: number;
   //this method indicates that the next 'set' should run and unmount this component
-  nextRoundIndex: () => void;
+  nextRound: (value: number) => void;
   //once this component is unmounted this method will mount the next one (if there is one) right after this unmounts
-  mountnextRound: () => void;
+  mountNextRound: () => void;
+  unmountCountdown: () => void;
+
+  buttonsToMove?: number;
 }
 
 interface ICountdownState {
@@ -18,6 +20,7 @@ interface ICountdownState {
   countdownTime: number;
   minutes: number;
   seconds: number;
+  isPaused: boolean;
 }
 
 export default class Countdown extends React.Component<
@@ -31,7 +34,14 @@ export default class Countdown extends React.Component<
       countdownTime: this.props.time,
       minutes: Math.floor(this.props.time / 60),
       seconds: this.props.time % 60,
+      isPaused: false,
     };
+
+    this.stopCountdown = this.stopCountdown.bind(this);
+    this.resumeCountdown = this.resumeCountdown.bind(this);
+    this.restartRound = this.restartRound.bind(this);
+    this.nextRound = this.nextRound.bind(this);
+    this.previousRound = this.previousRound.bind(this);
   }
 
   //this class variable will hold the setInterval, their only purpose is to be able to clear the interval
@@ -43,7 +53,7 @@ export default class Countdown extends React.Component<
     this.interval = setInterval(() => {
       if (this.state.countdownTime < 0) {
         clearInterval(this.interval);
-        this.props.nextRoundIndex();
+        this.props.nextRound(1);
       } else {
         this.setState({
           countdownTime: this.state.countdownTime - 1,
@@ -55,7 +65,50 @@ export default class Countdown extends React.Component<
   }
 
   componentWillUnmount() {
-    this.props.mountnextRound();
+    clearInterval(this.interval);
+    this.props.mountNextRound();
+  }
+
+  //this function will remove the setInterval to stop the countdown
+  stopCountdown() {
+    clearInterval(this.interval);
+    this.setState({
+      isPaused: true,
+    });
+  }
+
+  //this function will restart the countdown
+  resumeCountdown() {
+    this.setState({
+      isPaused: false,
+    });
+
+    this.interval = setInterval(() => {
+      if (this.state.countdownTime < 0) {
+        clearInterval(this.interval);
+        this.props.nextRound(1);
+      } else {
+        this.setState({
+          countdownTime: this.state.countdownTime - 1,
+          minutes: Math.floor(this.state.countdownTime / 60),
+          seconds: this.state.countdownTime % 60,
+        });
+      }
+    }, 1000);
+  }
+
+  //this function will restart the whole round or rest
+  restartRound() {
+    this.props.unmountCountdown();
+  }
+
+  //this function will
+  nextRound() {
+    this.props.nextRound(1);
+  }
+
+  previousRound() {
+    this.props.nextRound(-1);
   }
 
   render() {
@@ -76,6 +129,43 @@ export default class Countdown extends React.Component<
               <span>{this.state.seconds}</span>
             )}
           </span>
+        </div>
+        <div className='w-full max-w-md flex justify-around items-center'>
+          <button
+            className='rounded-full w-12 h-12 bg-gray-700 disabled:bg-gray-900'
+            disabled={this.props.buttonsToMove === -1}
+            onClick={this.previousRound}
+          >
+            <Icons value={'previous'} />
+          </button>
+          <button
+            className='rounded-full w-14 h-14 bg-gray-700'
+            onClick={this.restartRound}
+          >
+            <Icons value={'replay'} />
+          </button>
+          {this.state.isPaused ? (
+            <button
+              className='rounded-full w-16 h-16 bg-mint'
+              onClick={this.resumeCountdown}
+            >
+              <Icons value={'play'} />
+            </button>
+          ) : (
+            <button
+              className='rounded-full w-16 h-16 bg-gray-700'
+              onClick={this.stopCountdown}
+            >
+              <Icons value={'pause'} />
+            </button>
+          )}
+          <button
+            className='rounded-full w-12 h-12 bg-gray-700 disabled:bg-gray-900'
+            disabled={this.props.buttonsToMove === 1}
+            onClick={this.nextRound}
+          >
+            <Icons value={'next'} />
+          </button>
         </div>
       </div>
     );

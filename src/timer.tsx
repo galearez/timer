@@ -2,7 +2,7 @@ import React from 'react';
 import Countdown from './components/countdown';
 import { v4 as uuidv4 } from 'uuid';
 
-import { ReactComponent as MoreIcon } from './assets/delete.svg';
+import Icons from './components/icons';
 
 //Add move button to activities
 //Add buttons to stop the countdown, restart an activity and modify the routine
@@ -85,6 +85,7 @@ export default class Timer extends React.Component<{}, ITimerStates> {
     this.handleUserInput = this.handleUserInput.bind(this);
     this.handleHomeClose = this.handleHomeClose.bind(this);
     this.startCountdown = this.startCountdown.bind(this);
+    this.unmountCountdown = this.unmountCountdown.bind(this);
     this.nextRound = this.nextRound.bind(this);
     this.handleToggleFieldset = this.handleToggleFieldset.bind(this);
     this.handleScreenResize = this.handleScreenResize.bind(this);
@@ -116,6 +117,14 @@ export default class Timer extends React.Component<{}, ITimerStates> {
 
   //variable to keep track of the number of rounds, just for rounds default names
   roundDefaultNumber: number = 1;
+
+  //this variable will help to enable or disable the buttons to move to the next or the previous
+  //round in the routine -1 will disable the previous btn, 0 will enable both and 1 will disbale
+  //the next button
+
+  //I just realised I need a fourth option non of them enable, e.g. if there is only one round
+  //the user should not go forward nor back
+  buttonToMoveRound: number = -1;
 
   //when screen resize it will be called to change the screenWidth state which control some responsive rendering
   handleScreenResize() {
@@ -231,10 +240,10 @@ export default class Timer extends React.Component<{}, ITimerStates> {
   //this function will set which 'round' should run, also a change indicates that the current interval
   //it's done executing so the next one should run, that why we also pass a callback, this callback
   //unmount the component that just has finished
-  nextRound() {
+  nextRound(value: number) {
     this.setState(
       {
-        currentRound: this.state.currentRound + 1,
+        currentRound: this.state.currentRound + value,
       },
       () => {
         this.setState({
@@ -257,6 +266,14 @@ export default class Timer extends React.Component<{}, ITimerStates> {
     }
 
     return;
+  }
+
+  //This function will unmount the Countdown component, and since that action will trigger the Countdown
+  //componentWillUnmount() method, it will restart the current round
+  unmountCountdown() {
+    this.setState({
+      mountCountdown: false,
+    });
   }
 
   //when the user start the countdown the first time it will unmount all the 'home screen' elements
@@ -345,6 +362,19 @@ export default class Timer extends React.Component<{}, ITimerStates> {
     });
   }
 
+  //this method will control define the state of the buttons to move through the rounds
+  handleShowButtons() {
+    let difference = this.state.currentRound - this.state.routine.length;
+
+    if (difference === -1) {
+      this.buttonToMoveRound = 1;
+    } else if (this.state.currentRound === 0) {
+      this.buttonToMoveRound = -1;
+    } else {
+      this.buttonToMoveRound = 0;
+    }
+  }
+
   render() {
     //creates options for the minutes select box
     const sixtyOptions = ONE_BY_ONE.map((elem: number) => (
@@ -360,13 +390,17 @@ export default class Timer extends React.Component<{}, ITimerStates> {
       </option>
     ));
 
+    this.handleShowButtons();
+
     //holds the countdown component and it's assigned on each 'currentRound' change
     const countdownComponent = (
       <Countdown
         label={this.state.routine[this.state.currentRound]?.label}
         time={this.state.routine[this.state.currentRound]?.time}
-        nextRoundIndex={this.nextRound}
-        mountnextRound={this.startCountdown}
+        nextRound={this.nextRound}
+        mountNextRound={this.startCountdown}
+        unmountCountdown={this.unmountCountdown}
+        buttonsToMove={this.buttonToMoveRound}
       />
     );
 
@@ -399,7 +433,7 @@ export default class Timer extends React.Component<{}, ITimerStates> {
                   this.handleDeleteRound(elem.id);
                 }}
               >
-                <MoreIcon className='fill-current text-gray-50' />
+                <Icons value={'delete'} />
               </span>
             </div>
           </div>
@@ -411,7 +445,7 @@ export default class Timer extends React.Component<{}, ITimerStates> {
       <div className='w-full max-w-xl md:max-w-4xl m-auto md:grid grid-cols-2 gap-x-4'>
         <header className='flex justify-between items-center col-span-2'>
           <h1>Interval timer</h1>
-          {!this.state.closeHomeScreen && (
+          {!this.state.closeHomeScreen ? (
             <button
               className='font-bold text-white py-2 px-4 rounded-md bg-gradient-to-r from-mint to-lime'
               onClick={() => {
@@ -425,12 +459,16 @@ export default class Timer extends React.Component<{}, ITimerStates> {
             >
               Start timer
             </button>
+          ) : (
+            <button className='font-bold text-white py-2 px-4 rounded-md bg-gray-700'>
+              Restart all <Icons value={'restore'} />
+            </button>
           )}
         </header>
         {!this.state.closeHomeScreen && (
           <form className='w-full md:mt-2 flex flex-col col-start-1'>
             <fieldset className='text-lg mt-2 flex justify-between items-center'>
-              <h2>Repetir descansos</h2>
+              <h2>Repeat rest</h2>
               <label className='toggle-switch'>
                 <input
                   type='checkbox'
@@ -482,7 +520,7 @@ export default class Timer extends React.Component<{}, ITimerStates> {
                 }
               }}
             >
-              New activity
+              New Round
             </button>
           </div>
         )}
@@ -496,7 +534,7 @@ export default class Timer extends React.Component<{}, ITimerStates> {
               className='bg-gray-800 w-11/12 md:w-full p-2 md:p-0 rounded-md absolute md:relative top-1/2 left-1/2 md:top-auto md:left-auto transform -translate-y-1/2 -translate-x-1/2 md:transform-none'
               onSubmit={this.handleUserInput}
             >
-              <h2>Activity</h2>
+              <h2>Round</h2>
               <fieldset>
                 <label className='flex flex-col'>
                   Name
@@ -534,7 +572,7 @@ export default class Timer extends React.Component<{}, ITimerStates> {
               </fieldset>
               <fieldset className='bg-gray-700 mb-2 px-1 rounded-md'>
                 <span className='mt-1 flex justify-between items-center'>
-                  <h2>Descanso</h2>
+                  <h2>Rest</h2>
                   <label className='toggle-switch '>
                     <input
                       type='checkbox'
