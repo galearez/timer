@@ -101,6 +101,8 @@ export default class Timer extends React.Component<{}, ITimerStates> {
 
     this.handleDeleteRound = this.handleDeleteRound.bind(this);
 
+    this.handleRestartRoutine = this.handleRestartRoutine.bind(this);
+
     this.labelRef = React.createRef();
     this.roundMinRef = React.createRef();
     this.roundSecRef = React.createRef();
@@ -375,6 +377,19 @@ export default class Timer extends React.Component<{}, ITimerStates> {
     }
   }
 
+  //this function will restart the whole routine
+  handleRestartRoutine() {
+    this.setState(
+      {
+        currentRound: 0,
+        mountCountdown: false,
+      },
+      () => {
+        this.startCountdown();
+      }
+    );
+  }
+
   render() {
     //creates options for the minutes select box
     const sixtyOptions = ONE_BY_ONE.map((elem: number) => (
@@ -401,6 +416,7 @@ export default class Timer extends React.Component<{}, ITimerStates> {
         mountNextRound={this.startCountdown}
         unmountCountdown={this.unmountCountdown}
         buttonsToMove={this.buttonToMoveRound}
+        disbaleMoveButtons={this.state.routine.length === 1}
       />
     );
 
@@ -460,7 +476,10 @@ export default class Timer extends React.Component<{}, ITimerStates> {
               Start timer
             </button>
           ) : (
-            <button className='font-bold text-white py-2 px-4 rounded-md bg-gray-700'>
+            <button
+              className='font-bold text-white py-2 px-4 rounded-md bg-gray-700'
+              onClick={this.handleRestartRoutine}
+            >
               Restart all <Icons value={'restore'} />
             </button>
           )}

@@ -1,4 +1,5 @@
 import React from 'react';
+import clsx from 'clsx';
 
 import { ReactComponent as DeleteIcon } from '../assets/delete.svg';
 import { ReactComponent as PlayIcon } from '../assets/play.svg';
@@ -10,6 +11,7 @@ import { ReactComponent as RestoreIcon } from '../assets/restore.svg';
 
 interface IIconsProps {
   value: string;
+  disbale?: boolean;
 }
 
 export default class Icons extends React.Component<IIconsProps, {}> {
@@ -30,11 +32,21 @@ export default class Icons extends React.Component<IIconsProps, {}> {
           );
         case 'previous':
           return (
-            <PreviousIcon className='fill-current text-gray-50 inline-block' />
+            <PreviousIcon
+              className={clsx(
+                'fill-current text-gray-50 inline-block',
+                this.props.disbale ? 'opacity-60' : 'opacity-100'
+              )}
+            />
           );
         case 'next':
           return (
-            <NextIcon className='fill-current text-gray-50 inline-block' />
+            <NextIcon
+              className={clsx(
+                'fill-current text-gray-50 inline-block',
+                this.props.disbale ? 'opacity-60' : 'opacity-100'
+              )}
+            />
           );
         case 'replay':
           return (

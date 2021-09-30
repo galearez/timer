@@ -1,6 +1,8 @@
 import React from 'react';
 import Icons from './icons';
 
+//Adjust the layout
+
 interface ICountdownProps {
   //set label
   label: string;
@@ -12,7 +14,8 @@ interface ICountdownProps {
   mountNextRound: () => void;
   unmountCountdown: () => void;
 
-  buttonsToMove?: number;
+  buttonsToMove: number;
+  disbaleMoveButtons?: boolean;
 }
 
 interface ICountdownState {
@@ -66,6 +69,9 @@ export default class Countdown extends React.Component<
 
   componentWillUnmount() {
     clearInterval(this.interval);
+    this.setState({
+      countdownTime: 0,
+    });
     this.props.mountNextRound();
   }
 
@@ -131,13 +137,19 @@ export default class Countdown extends React.Component<
           </span>
         </div>
         <div className='w-full max-w-md flex justify-around items-center'>
-          <button
-            className='rounded-full w-12 h-12 bg-gray-700 disabled:bg-gray-900'
-            disabled={this.props.buttonsToMove === -1}
-            onClick={this.previousRound}
-          >
-            <Icons value={'previous'} />
-          </button>
+          {!this.props.disbaleMoveButtons && (
+            <button
+              className='rounded-full w-12 h-12 bg-gray-700 disabled:bg-gray-900'
+              disabled={this.props.buttonsToMove === -1}
+              onClick={this.previousRound}
+            >
+              <Icons
+                value={'previous'}
+                disbale={this.props.buttonsToMove === -1}
+              />
+            </button>
+          )}
+
           <button
             className='rounded-full w-14 h-14 bg-gray-700'
             onClick={this.restartRound}
@@ -159,13 +171,15 @@ export default class Countdown extends React.Component<
               <Icons value={'pause'} />
             </button>
           )}
-          <button
-            className='rounded-full w-12 h-12 bg-gray-700 disabled:bg-gray-900'
-            disabled={this.props.buttonsToMove === 1}
-            onClick={this.nextRound}
-          >
-            <Icons value={'next'} />
-          </button>
+          {!this.props.disbaleMoveButtons && (
+            <button
+              className='rounded-full w-12 h-12 bg-gray-700 disabled:bg-gray-900'
+              disabled={this.props.buttonsToMove === 1}
+              onClick={this.nextRound}
+            >
+              <Icons value={'next'} disbale={this.props.buttonsToMove === 1} />
+            </button>
+          )}
         </div>
       </div>
     );
