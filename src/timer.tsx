@@ -1,11 +1,9 @@
 import React from 'react';
 import Countdown from './components/countdown';
 import { v4 as uuidv4 } from 'uuid';
+import clsx from 'clsx';
 
 import Icons from './components/icons';
-
-//Add move button to activities
-//Add buttons to stop the countdown, restart an activity and modify the routine
 
 //this interface define the timer component states types
 interface ITimerStates {
@@ -420,14 +418,20 @@ export default class Timer extends React.Component<{}, ITimerStates> {
       />
     );
 
-    //this variable is meant to render the routine
-    const activitiesList = this.state.routine.map((elem: any) => {
+    //this variable is meant to show the next round on the routine
+    const nextActivity = () => {
+      if (this.state.currentRound === this.state.routine.length - 1) {
+        return <div className='h-20 w-1 mb-4'></div>;
+      }
+      const elem = this.state.routine[this.state.currentRound + 1];
       const minutes = Math.floor(elem.time / 60);
       const seconds = elem.time % 60;
 
       return (
-        <div key={elem.id}>
-          <div className='w-full bg-gray-700 rounded-md p-2 mb-2 flex justify-between items-center flex-nowrap text-lg'>
+        <div className='bg-gray-700 rounded-md mb-4'>
+          <h2 className='pt-2 px-2'>Next</h2>
+
+          <div className='w-full p-2 flex justify-between items-center flex-nowrap text-lg'>
             <span>{elem.label}</span>
             <div className='flex items-center'>
               <span>
@@ -443,173 +447,163 @@ export default class Timer extends React.Component<{}, ITimerStates> {
                   <span>{seconds}</span>
                 )}
               </span>
-              <span
-                className='inline-block ml-3'
-                onClick={() => {
-                  this.handleDeleteRound(elem.id);
-                }}
-              >
-                <Icons value={'delete'} />
-              </span>
             </div>
+          </div>
+        </div>
+      );
+    };
+
+    //this variable is meant to render the routine
+    const activitiesList = this.state.routine.map((elem: any) => {
+      const minutes = Math.floor(elem.time / 60);
+      const seconds = elem.time % 60;
+
+      return (
+        <div
+          key={elem.id}
+          className='w-full bg-gray-700 rounded-md p-2 mb-2 flex justify-between items-center flex-nowrap text-lg'
+        >
+          <span>{elem.label}</span>
+          <div className='flex items-center'>
+            <span>
+              {minutes < 10 ? <span>0{minutes}</span> : <span>{minutes}</span>}:
+              {seconds < 10 ? <span>0{seconds}</span> : <span>{seconds}</span>}
+            </span>
+            <span
+              className='inline-block ml-3'
+              onClick={() => {
+                this.handleDeleteRound(elem.id);
+              }}
+            >
+              <Icons value={'delete'} />
+            </span>
           </div>
         </div>
       );
     });
 
     return (
-      <div className='w-full max-w-xl md:max-w-4xl m-auto md:grid grid-cols-2 gap-x-4'>
-        <header className='flex justify-between items-center col-span-2'>
-          <h1>Interval timer</h1>
-          {!this.state.closeHomeScreen ? (
-            <button
-              className='font-bold text-white py-2 px-4 rounded-md bg-gradient-to-r from-mint to-lime'
-              onClick={() => {
-                if (this.state.routine.length !== 0) {
-                  this.startCountdown();
-                  this.handleHomeClose();
-                }
-
-                return;
-              }}
-            >
-              Start timer
-            </button>
-          ) : (
-            <button
-              className='font-bold text-white py-2 px-4 rounded-md bg-gray-700'
-              onClick={this.handleRestartRoutine}
-            >
-              Restart all <Icons value={'restore'} />
-            </button>
+      <div className='w-full max-w-xl m-auto md:grid grid-cols-1'>
+        <div
+          className={clsx(
+            'flex flex-col justify-between',
+            this.state.closeHomeScreen ? 'h-screen' : 'h-auto'
           )}
-        </header>
-        {!this.state.closeHomeScreen && (
-          <form className='w-full md:mt-2 flex flex-col col-start-1'>
-            <fieldset className='text-lg mt-2 flex justify-between items-center'>
-              <h2>Repeat rest</h2>
-              <label className='toggle-switch'>
-                <input
-                  type='checkbox'
-                  onChange={() => this.handleToggleFieldset('globalRests')}
-                  defaultChecked={this.state.globalRests}
-                />
-                <span className='slider'></span>
-              </label>
-            </fieldset>
-            {this.state.globalRests && (
-              <fieldset className='flex items-end'>
-                <label className='flex flex-col flex-1 mr-1'>
-                  Minutes
-                  <select
-                    value={this.state.minGlobalRest}
-                    className='form-select flex-none'
-                    onChange={this.handleMinGlobalRestChange}
-                    disabled={!this.state.globalRests}
-                  >
-                    {sixtyOptions}
-                  </select>
-                </label>
-                <label className='flex flex-col flex-1'>
-                  Seconds
-                  <select
-                    value={this.state.secGlobalRest}
-                    className='form-select flex-none'
-                    onChange={this.handleSecGlobalRestChange}
-                    disabled={!this.state.globalRests}
-                  >
-                    {twelveOptions}
-                  </select>
-                </label>
-              </fieldset>
+        >
+          <header className='flex justify-between items-center'>
+            <h1>Timer</h1>
+            {!this.state.closeHomeScreen ? (
+              <button
+                className='font-bold text-white py-2 px-4 rounded-md bg-gradient-to-r from-mint to-lime'
+                onClick={() => {
+                  if (this.state.routine.length !== 0) {
+                    this.startCountdown();
+                    this.handleHomeClose();
+                  }
+
+                  return;
+                }}
+              >
+                Start routine
+              </button>
+            ) : (
+              <button
+                className='font-bold text-white py-2 px-4 rounded-md bg-gray-700'
+                onClick={this.handleRestartRoutine}
+              >
+                Restart all <Icons value={'restore'} />
+              </button>
             )}
-          </form>
-        )}
-        {!this.state.closeHomeScreen && (
-          <div>
-            <hr className='w-9/12 m-auto mt-2 md:my-2 col-start-1' />
-            <button
-              className='font-bold block md:hidden w-3/5 text-white py-2 px-4 m-auto my-2 rounded-md bg-gray-600'
-              onClick={() => {
-                this.handleToggleFieldset('activityForm');
-                if (this.state.globalRests) {
-                  this.setState({
-                    singleRest: true,
-                  });
-                }
-              }}
-            >
-              New Round
-            </button>
-          </div>
-        )}
-        {!this.state.closeHomeScreen && this.state.activityForm && (
-          <div className='absolute md:relative top-0 left-0 w-full h-full col-start-1'>
-            <div
-              className='absolute md:hidden top-0 left-0 w-full h-full bg-gray-50 bg-opacity-30'
-              onClick={() => this.handleToggleFieldset('activityForm')}
-            ></div>
-            <form
-              className='bg-gray-800 w-11/12 md:w-full p-2 md:p-0 rounded-md absolute md:relative top-1/2 left-1/2 md:top-auto md:left-auto transform -translate-y-1/2 -translate-x-1/2 md:transform-none'
-              onSubmit={this.handleUserInput}
-            >
-              <h2>Round</h2>
-              <fieldset>
-                <label className='flex flex-col'>
-                  Name
+          </header>
+          {!this.state.closeHomeScreen && (
+            <form className='w-full md:mt-2 flex flex-col'>
+              <fieldset className='text-lg mt-2 flex justify-between items-center'>
+                <h2>Repeat rest</h2>
+                <label className='toggle-switch'>
                   <input
-                    type='text'
-                    className='form-input mt-1'
-                    ref={this.labelRef}
-                    placeholder={'Round ' + this.roundDefaultNumber}
+                    type='checkbox'
+                    onChange={() => this.handleToggleFieldset('globalRests')}
+                    defaultChecked={this.state.globalRests}
                   />
+                  <span className='slider'></span>
                 </label>
               </fieldset>
-              <fieldset className='flex items-end mb-2'>
-                <label className='flex flex-col flex-1 mr-1'>
-                  Minutes
-                  <select
-                    className='form-select flex-none'
-                    ref={this.roundMinRef}
-                    onChange={this.handleRoundMinChange}
-                    value={this.state.roundMin}
-                  >
-                    {sixtyOptions}
-                  </select>
-                </label>
-                <label className='flex flex-col flex-1'>
-                  Seconds
-                  <select
-                    className='form-select flex-none'
-                    ref={this.roundSecRef}
-                    onChange={this.handleRoundSecChange}
-                    value={this.state.roundSec}
-                  >
-                    {twelveOptions}
-                  </select>
-                </label>
-              </fieldset>
-              <fieldset className='bg-gray-700 mb-2 px-1 rounded-md'>
-                <span className='mt-1 flex justify-between items-center'>
-                  <h2>Rest</h2>
-                  <label className='toggle-switch '>
-                    <input
-                      type='checkbox'
-                      onClick={() => this.handleToggleFieldset('singleRest')}
-                      checked={this.state.singleRest}
-                    />
-                    <span className='slider'></span>
+              {this.state.globalRests && (
+                <fieldset className='flex items-end'>
+                  <label className='flex flex-col flex-1 mr-1'>
+                    Minutes
+                    <select
+                      value={this.state.minGlobalRest}
+                      className='form-select flex-none'
+                      onChange={this.handleMinGlobalRestChange}
+                      disabled={!this.state.globalRests}
+                    >
+                      {sixtyOptions}
+                    </select>
                   </label>
-                </span>
-                <span className='flex items-end mb-2'>
+                  <label className='flex flex-col flex-1'>
+                    Seconds
+                    <select
+                      value={this.state.secGlobalRest}
+                      className='form-select flex-none'
+                      onChange={this.handleSecGlobalRestChange}
+                      disabled={!this.state.globalRests}
+                    >
+                      {twelveOptions}
+                    </select>
+                  </label>
+                </fieldset>
+              )}
+            </form>
+          )}
+          {!this.state.closeHomeScreen && (
+            <div>
+              <hr className='w-9/12 m-auto mt-2 md:my-2' />
+              <button
+                className='font-bold block md:hidden w-3/5 text-white py-2 px-4 m-auto mt-2 rounded-md bg-gray-600'
+                onClick={() => {
+                  this.handleToggleFieldset('activityForm');
+                  if (this.state.globalRests) {
+                    this.setState({
+                      singleRest: true,
+                    });
+                  }
+                }}
+              >
+                New Round
+              </button>
+            </div>
+          )}
+          {!this.state.closeHomeScreen && this.state.activityForm && (
+            <div className='absolute md:relative top-0 left-0 w-full h-full'>
+              <div
+                className='absolute md:hidden top-0 left-0 w-full h-full bg-gray-50 bg-opacity-30'
+                onClick={() => this.handleToggleFieldset('activityForm')}
+              ></div>
+              <form
+                className='bg-gray-800 w-11/12 md:w-full p-2 md:p-0 rounded-md absolute md:relative top-1/2 left-1/2 md:top-auto md:left-auto transform -translate-y-1/2 -translate-x-1/2 md:transform-none'
+                onSubmit={this.handleUserInput}
+              >
+                <h2>Round</h2>
+                <fieldset>
+                  <label className='flex flex-col'>
+                    Name
+                    <input
+                      type='text'
+                      className='form-input mt-1'
+                      ref={this.labelRef}
+                      placeholder={'Round ' + this.roundDefaultNumber}
+                    />
+                  </label>
+                </fieldset>
+                <fieldset className='flex items-end mb-2'>
                   <label className='flex flex-col flex-1 mr-1'>
                     Minutes
                     <select
                       className='form-select flex-none'
-                      ref={this.restMinRef}
-                      value={this.state.minSingleRest}
-                      onChange={this.handleMinSingleRestChange}
-                      disabled={!this.state.singleRest}
+                      ref={this.roundMinRef}
+                      onChange={this.handleRoundMinChange}
+                      value={this.state.roundMin}
                     >
                       {sixtyOptions}
                     </select>
@@ -618,52 +612,76 @@ export default class Timer extends React.Component<{}, ITimerStates> {
                     Seconds
                     <select
                       className='form-select flex-none'
-                      ref={this.restSecRef}
-                      value={this.state.secSingleRest}
-                      onChange={this.handleSecSingleRestChange}
-                      disabled={!this.state.singleRest}
+                      ref={this.roundSecRef}
+                      onChange={this.handleRoundSecChange}
+                      value={this.state.roundSec}
                     >
                       {twelveOptions}
                     </select>
                   </label>
-                </span>
-              </fieldset>
-              <button
-                type='submit'
-                className='font-bold text-white block w-3/5 py-2 px-4 m-auto rounded-md bg-gradient-to-r from-mint to-lime'
-              >
-                Add round
-              </button>
-            </form>
-          </div>
-        )}
-        {this.state.screenWidth < 768 && !this.state.closeHomeScreen && (
-          <div className='col-start-1 md:col-start-2 md:row-start-2 md:row-span-4'>
-            {activitiesList}
-          </div>
-        )}
-        {this.state.screenWidth > 767 && (
-          <div className='md:mt-2 col-start-1 md:col-start-2 md:row-start-2 md:row-span-4'>
-            {activitiesList}
-          </div>
-        )}
-        {this.state.closeHomeScreen && (
-          <div className='row-span-6'>
-            {this.state.mountCountdown ? (
-              countdownComponent
-            ) : (
-              <div className='font-bold text-4xl md:text-6xl h-80 flex flex-col justify-center items-center'>
-                Completed!
-              </div>
-            )}
-            {this.state.routine[this.state.currentRound + 1] && (
-              <div className='bg-gray-700 rounded-md'>
-                <h2 className='pt-2 px-2'>Next</h2>
-                {activitiesList[this.state.currentRound + 1]}
-              </div>
-            )}
-          </div>
-        )}
+                </fieldset>
+                <fieldset className='bg-gray-700 mb-2 px-1 rounded-md'>
+                  <span className='mt-1 flex justify-between items-center'>
+                    <h2>Rest</h2>
+                    <label className='toggle-switch '>
+                      <input
+                        type='checkbox'
+                        onClick={() => this.handleToggleFieldset('singleRest')}
+                        checked={this.state.singleRest}
+                      />
+                      <span className='slider'></span>
+                    </label>
+                  </span>
+                  <span className='flex items-end mb-2'>
+                    <label className='flex flex-col flex-1 mr-1'>
+                      Minutes
+                      <select
+                        className='form-select flex-none'
+                        ref={this.restMinRef}
+                        value={this.state.minSingleRest}
+                        onChange={this.handleMinSingleRestChange}
+                        disabled={!this.state.singleRest}
+                      >
+                        {sixtyOptions}
+                      </select>
+                    </label>
+                    <label className='flex flex-col flex-1'>
+                      Seconds
+                      <select
+                        className='form-select flex-none'
+                        ref={this.restSecRef}
+                        value={this.state.secSingleRest}
+                        onChange={this.handleSecSingleRestChange}
+                        disabled={!this.state.singleRest}
+                      >
+                        {twelveOptions}
+                      </select>
+                    </label>
+                  </span>
+                </fieldset>
+                <button
+                  type='submit'
+                  className='font-bold text-white block w-3/5 py-2 px-4 m-auto rounded-md bg-gradient-to-r from-mint to-lime'
+                >
+                  Add round
+                </button>
+              </form>
+            </div>
+          )}
+          {this.state.closeHomeScreen && (
+            <div>
+              {this.state.mountCountdown ? (
+                countdownComponent
+              ) : (
+                <div className='font-bold text-4xl md:text-6xl h-80 flex flex-col justify-center items-center'>
+                  Completed!
+                </div>
+              )}
+            </div>
+          )}
+          {this.state.closeHomeScreen && nextActivity()}
+        </div>
+        <div className='mt-2'>{activitiesList}</div>
       </div>
     );
   }

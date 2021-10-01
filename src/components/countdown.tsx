@@ -1,8 +1,6 @@
 import React from 'react';
 import Icons from './icons';
 
-//Adjust the layout
-
 interface ICountdownProps {
   //set label
   label: string;
@@ -12,17 +10,22 @@ interface ICountdownProps {
   nextRound: (value: number) => void;
   //once this component is unmounted this method will mount the next one (if there is one) right after this unmounts
   mountNextRound: () => void;
+  //this property is a callback to unmount the current countdown, it's purpose is to restart the current round
   unmountCountdown: () => void;
-
+  //to show the move buttons depending on the current round and the size of the routine array
   buttonsToMove: number;
+  //if the routine is to short, maybe one round, we don't need buttons to move over the rounds
   disbaleMoveButtons?: boolean;
 }
 
 interface ICountdownState {
   //will hold the remaining time
   countdownTime: number;
+  //interger representing the minutes left
   minutes: number;
+  //interger representing the seconds left
   seconds: number;
+  //to change the button while paused and putting it back to normal when resumed
   isPaused: boolean;
 }
 
@@ -103,16 +106,16 @@ export default class Countdown extends React.Component<
     }, 1000);
   }
 
-  //this function will restart the whole round or rest
+  //this function will restart the current round
   restartRound() {
     this.props.unmountCountdown();
   }
 
-  //this function will
+  //this function will unmount the current round and will mount the next round if there is one
   nextRound() {
     this.props.nextRound(1);
   }
-
+  //this function will unmount the current round and will mount the previous round if there is one
   previousRound() {
     this.props.nextRound(-1);
   }
@@ -121,7 +124,7 @@ export default class Countdown extends React.Component<
     return (
       <div className='font-bold h-80 flex flex-col justify-center items-center'>
         <div className='text-2xl md:text-4xl'>{this.props.label}</div>
-        <div className='text-6xl md:text-8xl'>
+        <div className='text-6xl md:text-8xl mb-10'>
           <span>
             {this.state.minutes < 10 ? (
               <span>0{this.state.minutes}</span>
