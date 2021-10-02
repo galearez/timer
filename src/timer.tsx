@@ -427,7 +427,7 @@ export default class Timer extends React.Component<{}, ITimerStates> {
 
     //this variable is meant to show the next round on the routine
     const nextActivity = () => {
-      if (this.state.currentRound === this.state.routine.length - 1) {
+      if (this.state.currentRound >= this.state.routine.length - 1) {
         return <div className='h-20 w-1 mb-4'></div>;
       }
       const elem = this.state.routine[this.state.currentRound + 1];
