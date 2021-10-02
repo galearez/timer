@@ -5,6 +5,13 @@ import clsx from 'clsx';
 
 import Icons from './components/icons';
 
+//So whats next?
+//  Add sounds
+//  Delete the input outlines
+//  Create a visual indicator of the current round in the activityList
+//  Refactor and Optimize
+//  And it will be done forever.
+
 //this interface define the timer component states types
 interface ITimerStates {
   routine: any[];
