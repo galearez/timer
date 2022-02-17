@@ -1,6 +1,7 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useAppSelector, useAppDispatch } from './app/hooks';
 import { addRound, removeRound } from './countdown/routineSlice';
+import { mount } from './countdown/mountCountdownSlice';
 import Countdown from './components/countdown';
 import { v4 as uuidv4 } from 'uuid';
 import clsx from 'clsx';
@@ -33,7 +34,7 @@ function App() {
   // Component states
   let routine = useAppSelector((state) => state.rotuine.value);
   let [currentRound, setCurrentRound] = useState(0);
-  let [mountCountDown, setMountCountdown] = useState(false);
+  let mountCountdown = useAppSelector((state) => state.mountCountdown.value);
   let [globalRests, setGlobalRests] = useState(false);
   let [singleRest, setSingleRest] = useState(false);
   let [activityForm, setActivityForm] = useState(false);
@@ -156,30 +157,6 @@ function App() {
   let nextRound = useCallback((value: number) => {
     setCurrentRound((prevState) => prevState + value);
   }, []);
-
-  useEffect(() => {
-    setMountCountdown(false);
-  }, [currentRound]);
-
-  //this function will start a countdown, is used in two cases:
-  //first, the user click in start timer
-  //second, one countdown reach zero, unmounts and if there is another round it will mount the component again for the new round
-  function startCountdown() {
-    //this condition checks if there are elements in the routine array to
-    //run a countdown, if so the component 'Countdown' will be mounted
-    if (currentRound < routine.length) {
-      setMountCountdown(true);
-    }
-
-    return;
-  }
-
-  //This function will unmount the Countdown component, and since that action will trigger the Countdown
-  //componentWillUnmount() method, it will restart the current round
-  let unmountCountdown = useCallback(() => {
-    setMountCountdown(false);
-  }, []);
-
   //when the user start the countdown the first time it will unmount all the 'home screen' elements
   function handleHomeClose() {
     setCloseHomeScreen(true);
@@ -258,15 +235,7 @@ function App() {
   //this function will restart the whole routine
   function handleRestartRoutine() {
     setCurrentRound(0);
-    setMountCountdown(false);
   }
-
-  useEffect(() => {
-    if (currentRound === 0 && mountCountDown === false) {
-      startCountdown();
-    }
-  }, [currentRound, mountCountDown]);
-
   //creates options for the minutes select box
   const sixtyOptions = ONE_BY_ONE.map((elem: number) => (
     <option value={elem} key={elem}>
@@ -286,14 +255,9 @@ function App() {
   //holds the countdown component and it's assigned on each 'currentRound' change
   const countdownComponent = (
     <Countdown
-      label={routine[currentRound]?.label}
-      time={routine[currentRound]?.time}
       nextRound={nextRound}
-      mountNextRound={startCountdown}
-      unmountCountdown={unmountCountdown}
       buttonsToMove={buttonToMoveRound}
       disbaleMoveButtons={routine.length === 1}
-      routine={routine}
     />
   );
 
@@ -367,11 +331,9 @@ function App() {
               className='font-bold text-white py-2 px-4 rounded-md bg-gradient-to-r from-mint to-lime'
               onClick={() => {
                 if (routine.length !== 0) {
-                  startCountdown();
+                  dispatch(mount());
                   handleHomeClose();
                 }
-
-                return;
               }}
             >
               Start routine
@@ -538,7 +500,7 @@ function App() {
         )}
         {closeHomeScreen && (
           <div>
-            {mountCountDown ? (
+            {mountCountdown ? (
               countdownComponent
             ) : (
               <div className='font-bold text-4xl md:text-6xl h-80 flex flex-col justify-center items-center'>

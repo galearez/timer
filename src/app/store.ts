@@ -1,9 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit';
 import routineSlice from '../countdown/routineSlice';
+import mountCountdownSlice from '../countdown/mountCountdownSlice';
 
 const store = configureStore({
   reducer: {
     rotuine: routineSlice,
+    mountCountdown: mountCountdownSlice,
   },
 });
 
