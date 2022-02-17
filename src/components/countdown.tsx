@@ -1,12 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
+import { next, previous, restart } from '../countdown/currentSlice';
 import { unmount } from '../countdown/mountCountdownSlice';
 
 import Icons from './icons';
 
 interface ICountdownProps {
-  //this method indicates that the next 'set' should run and unmount this component
-  nextRound: (value: number) => void;
   //to show the move buttons depending on the current round and the size of the routine array
   buttonsToMove: number;
   //if the routine is to short, maybe one round, we don't need buttons to move over the rounds
@@ -18,10 +17,10 @@ function Countdown(props: ICountdownProps) {
   const dispatch = useAppDispatch();
 
   const routine = useAppSelector((state) => state.rotuine.value);
+  let currentRound = useAppSelector((state) => state.current.value);
 
-  let [round, setRound] = useState(0);
   const time = routine ? routine[0].time : 0;
-  const label = routine[round]?.label;
+  const label = routine[currentRound]?.label;
   let [countdownTime, setCountdownTime] = useState(time);
   let [minutes, setMinutes] = useState(Math.floor(time / 60));
   let [seconds, setSeconds] = useState(time % 60);
@@ -35,7 +34,7 @@ function Countdown(props: ICountdownProps) {
   useEffect(() => {
     interval.current = window.setInterval(() => {
       if (countdownTime <= 0) {
-        setRound((prevStatae) => prevStatae + 1);
+        dispatch(next());
         clearInterval(interval.current);
       } else {
         setCountdownTime(countdownTime - 1);
@@ -45,7 +44,7 @@ function Countdown(props: ICountdownProps) {
     return () => {
       clearInterval(interval.current);
     };
-  }, [countdownTime]);
+  }, [countdownTime, dispatch]);
 
   useEffect(() => {
     setMinutes(Math.floor(countdownTime / 60));
@@ -53,22 +52,14 @@ function Countdown(props: ICountdownProps) {
   }, [countdownTime]);
 
   useEffect(() => {
-    if (round < routine.length) {
-      setCountdownTime(routine[round].time);
-    }
-  }, [round, routine]);
-  let propNextRound = props.nextRound;
-  useEffect(() => {
-
-    if (routine?.length < round) {
-      propNextRound(1);
+    if (currentRound < routine.length) {
+      setCountdownTime(routine[currentRound].time);
     }
 
-    
-    if (round >= routine.length) {
+    if (currentRound >= routine.length) {
       dispatch(unmount());
     }
-  }, [round, routine, propsNextRound, dispatch]);
+  }, [currentRound, routine, dispatch]);
 
   //this function will remove the setInterval to stop the countdown
   function stopCountdown() {
@@ -85,28 +76,19 @@ function Countdown(props: ICountdownProps) {
 
   //this function will restart the current round
   function restartRound() {
-    if (routine) {
-      setCountdownTime(routine[round].time);
-    }
-
-    return;
+    dispatch(restart());
+    setCountdownTime(routine[currentRound].time);
   }
 
   //this function will unmount the current round and will mount the next round if there is one
   function nextRound() {
-    setRound(round + 1);
-
-    if (routine) {
-      setCountdownTime(routine[round].time);
-    }
+    dispatch(next());
   }
+
   //this function will unmount the current round and will mount the previous round if there is one
   function previousRound() {
-    setRound(round + 1);
-
-    if (routine) {
-      setCountdownTime(routine[round].time);
-    }
+    dispatch(previous());
+    setCountdownTime(routine[currentRound].time);
   }
 
   //the buttons will now be controlled by the component, since I now moved the logic to navigate through

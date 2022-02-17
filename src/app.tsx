@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useAppSelector, useAppDispatch } from './app/hooks';
 import { addRound, removeRound } from './countdown/routineSlice';
 import { mount } from './countdown/mountCountdownSlice';
+import { restart } from './countdown/currentSlice';
 import Countdown from './components/countdown';
 import { v4 as uuidv4 } from 'uuid';
 import clsx from 'clsx';
@@ -33,7 +34,7 @@ function App() {
   const dispatch = useAppDispatch();
   // Component states
   let routine = useAppSelector((state) => state.rotuine.value);
-  let [currentRound, setCurrentRound] = useState(0);
+  let currentRound = useAppSelector((state) => state.current.value);
   let mountCountdown = useAppSelector((state) => state.mountCountdown.value);
   let [globalRests, setGlobalRests] = useState(false);
   let [singleRest, setSingleRest] = useState(false);
@@ -154,9 +155,6 @@ function App() {
     }
   }
 
-  let nextRound = useCallback((value: number) => {
-    setCurrentRound((prevState) => prevState + value);
-  }, []);
   //when the user start the countdown the first time it will unmount all the 'home screen' elements
   function handleHomeClose() {
     setCloseHomeScreen(true);
@@ -232,10 +230,6 @@ function App() {
     }
   }
 
-  //this function will restart the whole routine
-  function handleRestartRoutine() {
-    setCurrentRound(0);
-  }
   //creates options for the minutes select box
   const sixtyOptions = ONE_BY_ONE.map((elem: number) => (
     <option value={elem} key={elem}>
@@ -255,7 +249,6 @@ function App() {
   //holds the countdown component and it's assigned on each 'currentRound' change
   const countdownComponent = (
     <Countdown
-      nextRound={nextRound}
       buttonsToMove={buttonToMoveRound}
       disbaleMoveButtons={routine.length === 1}
     />
@@ -341,7 +334,7 @@ function App() {
           ) : (
             <button
               className='font-bold text-white py-2 px-4 rounded-md bg-gray-700'
-              onClick={handleRestartRoutine}
+              onClick={() => dispatch(restart())}
             >
               Restart all <Icons value={'restore'} />
             </button>
