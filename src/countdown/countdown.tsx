@@ -6,13 +6,13 @@ import { unmount } from './mountCountdownSlice';
 import Icons from '../utils/icons';
 
 interface ICountdownProps {
-  //to show the move buttons depending on the current round and the size of the routine array
-  buttonsToMove: number;
   //if the routine is to short, maybe one round, we don't need buttons to move over the rounds
   disbaleMoveButtons?: boolean;
 }
 
-// Yasta solo limpio y ya quedó el primer functional component, Noice
+// This type will ensure the buttonState is a number with 3 possible values
+type ButtonDisable = 'left' | 'none' | 'right';
+
 function Countdown(props: ICountdownProps) {
   const dispatch = useAppDispatch();
 
@@ -25,6 +25,7 @@ function Countdown(props: ICountdownProps) {
   let [minutes, setMinutes] = useState(Math.floor(time / 60));
   let [seconds, setSeconds] = useState(time % 60);
   let [isPaused, setIsPaused] = useState(false);
+  let [disableButton, setDisableButton] = useState<ButtonDisable>('left');
 
   //this class variable will hold the setInterval, their only purpose is to be able to clear the interval
   let interval = useRef<number>();
@@ -58,6 +59,14 @@ function Countdown(props: ICountdownProps) {
 
     if (currentRound >= routine.length) {
       dispatch(unmount());
+    }
+
+    if (currentRound === routine.length - 1) {
+      setDisableButton('right');
+    } else if (currentRound === 0) {
+      setDisableButton('left');
+    } else {
+      setDisableButton('none');
     }
   }, [currentRound, routine, dispatch]);
 
@@ -107,10 +116,10 @@ function Countdown(props: ICountdownProps) {
         {!props.disbaleMoveButtons && (
           <button
             className='rounded-full w-12 h-12 bg-gray-700 disabled:bg-gray-900'
-            disabled={props.buttonsToMove === -1}
+            disabled={disableButton === 'left'}
             onClick={previousRound}
           >
-            <Icons value={'previous'} disable={props.buttonsToMove === -1} />
+            <Icons value={'previous'} disable={disableButton === 'left'} />
           </button>
         )}
 
@@ -138,10 +147,10 @@ function Countdown(props: ICountdownProps) {
         {!props.disbaleMoveButtons && (
           <button
             className='rounded-full w-12 h-12 bg-gray-700 disabled:bg-gray-900'
-            disabled={props.buttonsToMove === 1}
+            disabled={disableButton === 'right'}
             onClick={nextRound}
           >
-            <Icons value={'next'} disable={props.buttonsToMove === 1} />
+            <Icons value={'next'} disable={disableButton === 'right'} />
           </button>
         )}
       </div>

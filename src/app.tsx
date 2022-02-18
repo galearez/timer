@@ -57,8 +57,6 @@ function App() {
   // this variable is meant to be use on naming when the user don't specify a activity name
   let roundDefaultNumber = 1;
 
-  let buttonToMoveRound = -1;
-
   useEffect(() => {
     window.addEventListener('resize', () => setScreenWidth(window.innerWidth));
 
@@ -217,19 +215,6 @@ function App() {
     dispatch(removeRound(id));
   }
 
-  //this method will control define the state of the buttons to move through the rounds
-  function handleShowButtons() {
-    let difference = currentRound - routine.length;
-
-    if (difference === -1) {
-      buttonToMoveRound = 1;
-    } else if (currentRound === 0) {
-      buttonToMoveRound = -1;
-    } else {
-      buttonToMoveRound = 0;
-    }
-  }
-
   //creates options for the minutes select box
   const sixtyOptions = ONE_BY_ONE.map((elem: number) => (
     <option value={elem} key={elem}>
@@ -244,14 +229,9 @@ function App() {
     </option>
   ));
 
-  handleShowButtons();
-
   //holds the countdown component and it's assigned on each 'currentRound' change
   const countdownComponent = (
-    <Countdown
-      buttonsToMove={buttonToMoveRound}
-      disbaleMoveButtons={routine.length === 1}
-    />
+    <Countdown disbaleMoveButtons={routine.length === 1} />
   );
 
   //this variable is meant to show the next round on the routine
