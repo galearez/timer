@@ -3,11 +3,11 @@ import { useAppSelector, useAppDispatch } from './app/hooks';
 import { addRound, removeRound } from './countdown/routineSlice';
 import { mount } from './countdown/mountCountdownSlice';
 import { restart } from './countdown/currentSlice';
-import Countdown from './components/countdown';
+import Countdown from './countdown/countdown';
 import { v4 as uuidv4 } from 'uuid';
 import clsx from 'clsx';
 
-import Icons from './components/icons';
+import Icons from './components/utils';
 
 //before this change this two arrays where auto-generated on component mounting, but there was a big problem
 //it needs to 'update' before generating the options for the select box so when using it on desktop there

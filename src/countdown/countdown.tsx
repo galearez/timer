@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { next, previous, restart } from '../countdown/currentSlice';
-import { unmount } from '../countdown/mountCountdownSlice';
+import { next, previous, restart } from './currentSlice';
+import { unmount } from './mountCountdownSlice';
 
-import Icons from './icons';
+import Icons from '../components/utils';
 
 interface ICountdownProps {
   //to show the move buttons depending on the current round and the size of the routine array
