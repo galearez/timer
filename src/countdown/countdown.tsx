@@ -5,15 +5,10 @@ import { unmount } from './mountCountdownSlice';
 
 import Icons from '../utils/icons';
 
-interface ICountdownProps {
-  //if the routine is to short, maybe one round, we don't need buttons to move over the rounds
-  disbaleMoveButtons?: boolean;
-}
-
 // This type will ensure the buttonState is a number with 3 possible values
 type ButtonDisable = 'left' | 'none' | 'right';
 
-function Countdown(props: ICountdownProps) {
+function Countdown() {
   const dispatch = useAppDispatch();
 
   const routine = useAppSelector((state) => state.rotuine.value);
@@ -26,6 +21,7 @@ function Countdown(props: ICountdownProps) {
   let [seconds, setSeconds] = useState(time % 60);
   let [isPaused, setIsPaused] = useState(false);
   let [disableButton, setDisableButton] = useState<ButtonDisable>('left');
+  let disableAllMoveButtons = routine.length === 0;
 
   //this class variable will hold the setInterval, their only purpose is to be able to clear the interval
   let interval = useRef<number>();
@@ -113,7 +109,7 @@ function Countdown(props: ICountdownProps) {
         </span>
       </div>
       <div className='w-full max-w-md flex justify-around items-center'>
-        {!props.disbaleMoveButtons && (
+        {!disableAllMoveButtons && (
           <button
             className='rounded-full w-12 h-12 bg-gray-700 disabled:bg-gray-900'
             disabled={disableButton === 'left'}
@@ -144,7 +140,7 @@ function Countdown(props: ICountdownProps) {
             <Icons value={'pause'} />
           </button>
         )}
-        {!props.disbaleMoveButtons && (
+        {!disableAllMoveButtons && (
           <button
             className='rounded-full w-12 h-12 bg-gray-700 disabled:bg-gray-900'
             disabled={disableButton === 'right'}

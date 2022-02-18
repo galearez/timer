@@ -229,11 +229,6 @@ function App() {
     </option>
   ));
 
-  //holds the countdown component and it's assigned on each 'currentRound' change
-  const countdownComponent = (
-    <Countdown disbaleMoveButtons={routine.length === 1} />
-  );
-
   //this variable is meant to show the next round on the routine
   const nextActivity = () => {
     if (currentRound >= routine.length - 1) {
@@ -474,7 +469,7 @@ function App() {
         {closeHomeScreen && (
           <div>
             {mountCountdown ? (
-              countdownComponent
+              <Countdown />
             ) : (
               <div className='font-bold text-4xl md:text-6xl h-80 flex flex-col justify-center items-center'>
                 Completed!
