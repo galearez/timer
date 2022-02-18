@@ -21,11 +21,6 @@ const ONE_BY_ONE = [
   60,
 ];
 
-interface IRound {
-  id: string;
-  label: string;
-  time: number;
-}
 //this component will handle the user input and will pass main data, rounds (id, label and time)
 //to the other components
 function App() {
@@ -46,6 +41,8 @@ function App() {
   let [minSingleRest, setMinSingleRest] = useState(0);
   let [secSingleRest, setSecSingleRest] = useState(0);
   let [closeHomeScreen, setCloseHomeScreen] = useState(false);
+  // this variable is meant to be use on naming when the user don't specify a activity name
+  let [roundDefaultName, setRoundDefaultName] = useState(1);
 
   // user input box references
   let labelRef: React.RefObject<HTMLInputElement> = useRef(null);
@@ -53,9 +50,6 @@ function App() {
   let roundSecRef: React.RefObject<HTMLSelectElement> = useRef(null);
   let restMinRef: React.RefObject<HTMLSelectElement> = useRef(null);
   let restSecRef: React.RefObject<HTMLSelectElement> = useRef(null);
-
-  // this variable is meant to be use on naming when the user don't specify a activity name
-  let roundDefaultNumber = 1;
 
   useEffect(() => {
     window.addEventListener('resize', () => setScreenWidth(window.innerWidth));
@@ -82,66 +76,53 @@ function App() {
     }
   }, [screenWidth, activityForm]);
 
+  //Lo siguiente que voy a refactorizar es esta boorguir
+  type SelectRefsArray = [
+    React.RefObject<HTMLSelectElement>,
+    React.RefObject<HTMLSelectElement>,
+    React.RefObject<HTMLSelectElement>,
+    React.RefObject<HTMLSelectElement>
+  ];
+
   //this function get the values from the user and assign them to the routine state
-  function handleUserInput(event: React.FormEvent<HTMLFormElement>) {
+  function handleUserInput(
+    event: React.FormEvent<HTMLFormElement>,
+    roundId: number,
+    label?: React.RefObject<HTMLInputElement>,
+    ...selects: SelectRefsArray
+  ) {
     event.preventDefault();
 
-    //check if the user wrote a valid string as the round label, if not it will be assigned a default name
-    let inputLabel: string = '';
-    if (
-      labelRef.current?.value === '' ||
-      labelRef.current?.value === undefined
-    ) {
-      inputLabel = 'Round ' + roundDefaultNumber; //default name if the user don't specify one
+    // parse times from strings to integers, since I used a select with only numbers as options
+    // there will not be problem on parsing
+    const activityMin = parseInt(selects[0].current?.value ?? '0');
+    const activitySec = parseInt(selects[1].current?.value ?? '0');
+    const restMin = parseInt(selects[2].current?.value ?? '0');
+    const restSec = parseInt(selects[3].current?.value ?? '0');
+
+    // convert minutes and seconds to a single time value in seconds
+    const activityTime = activityMin * 60 + activitySec;
+    const restTime = restMin * 60 + restSec;
+    if (activityTime > 0) {
+      const roundlabel = label?.current?.value
+        ? label?.current?.value
+        : `Round ${roundId}`;
+      dispatch(
+        addRound({ id: uuidv4(), label: roundlabel, time: activityTime })
+      );
+
+      //once a round is created it adds one to the counter
+      setRoundDefaultName((prev) => prev + 1);
     }
-
-    //This block of code it's very ugly find a way to make it look beautiful
-    let inputMin = roundMinRef.current?.value;
-    let inputSec = roundSecRef.current?.value;
-    let inputRestMin = restMinRef.current?.value;
-    let inputRestSec = restSecRef.current?.value;
-    if (
-      inputMin === undefined ||
-      inputSec === undefined ||
-      inputRestMin === undefined ||
-      inputRestSec === undefined
-    ) {
-      return;
-    }
-
-    //convert the string values to numbers
-    const timeActivityMin = parseInt(inputMin);
-    const timeActivitySec = parseInt(inputSec);
-    const timeRestMin = parseInt(inputRestMin);
-    const timeRestSec = parseInt(inputRestSec);
-
-    //convert the activity time to seconds
-    const timeActivity = timeActivityMin * 60 + timeActivitySec;
-    const timeRest = timeRestMin * 60 + timeRestSec;
-
-    //if there is no time for an activity it will not create a routine round
-    if (timeActivity === 0) {
-      return;
-    }
-    let pruebita: IRound[] = [];
-    pruebita.push({ id: uuidv4(), label: inputLabel, time: timeActivity });
-    //only the values that met the conditions will be assigned to the user routine
-    //label must be a valid string
-    //time must be an integer between 0 and 60
-    dispatch(addRound({ id: uuidv4(), label: inputLabel, time: timeActivity }));
-
-    //once a round is created it adds one to the counter
-    roundDefaultNumber++;
 
     //add a rest after the round if the user has one of the add Rest switch enabled, this is like this
     //because that way the user can turn off the global rest if they don't need it between rounds
-    if (singleRest) {
-      dispatch(addRound({ id: uuidv4(), label: 'Rest', time: timeRest }));
+    if (singleRest && restTime !== 0) {
+      dispatch(addRound({ id: uuidv4(), label: 'Rest', time: restTime }));
     }
 
     //reset the values of the single rests, if there are global rests, they will be reset to that value, if not
     //they will be reset to 0
-
     setMinSingleRest(minGlobalRest);
     setSecSingleRest(secGlobalRest);
     setRoundMin(0);
@@ -380,7 +361,17 @@ function App() {
             ></div>
             <form
               className='bg-gray-800 w-11/12 md:w-full p-2 md:p-0 rounded-md absolute md:relative top-1/2 left-1/2 md:top-auto md:left-auto transform -translate-y-1/2 -translate-x-1/2 md:transform-none'
-              onSubmit={handleUserInput}
+              onSubmit={(event) =>
+                handleUserInput(
+                  event,
+                  roundDefaultName,
+                  labelRef,
+                  roundMinRef,
+                  roundSecRef,
+                  restMinRef,
+                  restSecRef
+                )
+              }
             >
               <h2>Round</h2>
               <fieldset>
@@ -390,7 +381,7 @@ function App() {
                     type='text'
                     className='form-input mt-1'
                     ref={labelRef}
-                    placeholder={'Round ' + roundDefaultNumber}
+                    placeholder={`Round ${roundDefaultName}`}
                   />
                 </label>
               </fieldset>
