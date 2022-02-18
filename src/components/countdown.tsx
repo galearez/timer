@@ -110,7 +110,7 @@ function Countdown(props: ICountdownProps) {
             disabled={props.buttonsToMove === -1}
             onClick={previousRound}
           >
-            <Icons value={'previous'} disbale={props.buttonsToMove === -1} />
+            <Icons value={'previous'} disable={props.buttonsToMove === -1} />
           </button>
         )}
 
@@ -141,7 +141,7 @@ function Countdown(props: ICountdownProps) {
             disabled={props.buttonsToMove === 1}
             onClick={nextRound}
           >
-            <Icons value={'next'} disbale={props.buttonsToMove === 1} />
+            <Icons value={'next'} disable={props.buttonsToMove === 1} />
           </button>
         )}
       </div>
