@@ -7,7 +7,7 @@ import Countdown from './countdown/countdown';
 import { v4 as uuidv4 } from 'uuid';
 import clsx from 'clsx';
 
-import Icons from './components/utils';
+import Icons from './utils/icons';
 
 //before this change this two arrays where auto-generated on component mounting, but there was a big problem
 //it needs to 'update' before generating the options for the select box so when using it on desktop there

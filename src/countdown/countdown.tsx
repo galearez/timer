@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { next, previous, restart } from './currentSlice';
 import { unmount } from './mountCountdownSlice';
 
-import Icons from '../components/utils';
+import Icons from '../utils/icons';
 
 interface ICountdownProps {
   //to show the move buttons depending on the current round and the size of the routine array
