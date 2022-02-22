@@ -21,27 +21,26 @@ const ONE_BY_ONE = [
   60,
 ];
 
-//this component will handle the user input and will pass main data, rounds (id, label and time)
-//to the other components
+// this component will handle the user input and will pass main data, rounds (id, label and time)
+// to the other components
 function App() {
   let [screenWidth, setScreenWidth] = useState(window.innerWidth);
 
   const dispatch = useAppDispatch();
-  // Component states
+  // these are global states controlled by redux
   let routine = useAppSelector((state) => state.rotuine.value);
   let currentRound = useAppSelector((state) => state.current.value);
   let mountCountdown = useAppSelector((state) => state.mountCountdown.value);
+  // these states control the current round time
+  // these states control when the user selects to add a rest after each avtivity
   let [globalRests, setGlobalRests] = useState(false);
+  // these states control when the user selects to add a rest after the current activity
   let [singleRest, setSingleRest] = useState(false);
+  // this state is a boolean becuase is used to show the main input form based on the viewport size
   let [activityForm, setActivityForm] = useState(false);
-  let [roundMin, setRoundMin] = useState(0);
-  let [roundSec, setRoundSec] = useState(0);
-  let [minGlobalRest, setMinGlobalRest] = useState(0);
-  let [secGlobalRest, setSecGlobalRest] = useState(0);
-  let [minSingleRest, setMinSingleRest] = useState(0);
-  let [secSingleRest, setSecSingleRest] = useState(0);
+  // this state is meant to unmount the home UI and mount/unmount the countdown component
   let [closeHomeScreen, setCloseHomeScreen] = useState(false);
-  // this variable is meant to be use on naming when the user don't specify a activity name
+  // this state is meant to be use on naming when the user don't specify an activity name
   let [roundDefaultName, setRoundDefaultName] = useState(1);
 
   // user input box references
@@ -54,7 +53,7 @@ function App() {
   useEffect(() => {
     window.addEventListener('resize', () => setScreenWidth(window.innerWidth));
 
-    //unmount the window resize event listener
+    // unmount the window resize event listener
     return () => {
       window.removeEventListener('resize', () =>
         setScreenWidth(window.innerWidth)
@@ -62,7 +61,7 @@ function App() {
     };
   }, []);
 
-  //when screen resize it will be called to change the screenWidth state which control some responsive rendering
+  // when screen resize it will be called to change the screenWidth state which control some responsive rendering
   useEffect(() => {
     if (screenWidth > 767 && !activityForm) {
       setActivityForm(true);
@@ -76,7 +75,8 @@ function App() {
     }
   }, [screenWidth, activityForm]);
 
-  //Lo siguiente que voy a refactorizar es esta boorguir
+  // just because I don't want to have a big parameter list on 'handleUserInput' I created this
+  // type which is meant to be used with rest parameters
   type SelectRefsArray = [
     React.RefObject<HTMLSelectElement>,
     React.RefObject<HTMLSelectElement>,
@@ -84,7 +84,7 @@ function App() {
     React.RefObject<HTMLSelectElement>
   ];
 
-  //this function get the values from the user and assign them to the routine state
+  // this function get the values from the user and assign them to the routine state
   function handleUserInput(
     event: React.FormEvent<HTMLFormElement>,
     roundId: number,
@@ -103,45 +103,43 @@ function App() {
     // convert minutes and seconds to a single time value in seconds
     const activityTime = activityMin * 60 + activitySec;
     const restTime = restMin * 60 + restSec;
-    if (activityTime > 0) {
-      const roundlabel = label?.current?.value
-        ? label?.current?.value
-        : `Round ${roundId}`;
-      dispatch(
-        addRound({ id: uuidv4(), label: roundlabel, time: activityTime })
-      );
-
-      //once a round is created it adds one to the counter
-      setRoundDefaultName((prev) => prev + 1);
+    if (activityTime === 0) {
+      return;
     }
 
-    //add a rest after the round if the user has one of the add Rest switch enabled, this is like this
-    //because that way the user can turn off the global rest if they don't need it between rounds
+    // after everyting has been parsed and the time is > 0, add activity to the routine
+    const activitylabel = label?.current?.value
+      ? label?.current?.value
+      : `Activity ${roundId}`;
+    dispatch(
+      addRound({ id: uuidv4(), label: activitylabel, time: activityTime })
+    );
+
+    // once a round is created it adds one to the counter
+    setRoundDefaultName((prev) => prev + 1);
+
+    // add a rest after the round if the user has one of the add Rest switches enabled, it is like this
+    // because that way the user can turn off the global rest if they don't need it between rounds
     if (singleRest && restTime !== 0) {
       dispatch(addRound({ id: uuidv4(), label: 'Rest', time: restTime }));
     }
 
-    //reset the values of the single rests, if there are global rests, they will be reset to that value, if not
-    //they will be reset to 0
+    // reset the values of the single rests, if there are global rests, they will be reset to that value, if not
+    // they will be reset to 0
     setMinSingleRest(minGlobalRest);
     setSecSingleRest(secGlobalRest);
-    setRoundMin(0);
-    setRoundSec(0);
+    setRoundMin('0');
+    setRoundSec('0');
 
-    //close the input form modal
+    // close the input form modal
     if (screenWidth < 768) {
       setActivityForm(false);
     }
   }
 
-  //when the user start the countdown the first time it will unmount all the 'home screen' elements
-  function handleHomeClose() {
-    setCloseHomeScreen(true);
-  }
-
-  //this function will handle all the fields where the input can add data, they will only be rendered
-  //once the user need them in mobile, in screens > 768, they will be rendered by default and the only
-  //conditional rendering will be the other components
+  // this function will handle all the fields where the input can add data, they will only be rendered
+  // once the user need them in mobile, in screens > 768, they will be rendered by default and the only
+  // conditional rendering will be the other components
   function handleToggleFieldset(field: string) {
     switch (field) {
       case 'globalRests':
@@ -159,58 +157,58 @@ function App() {
     }
   }
 
-  //handle global rest select value, and also single rests to show that they will be added
+  // handle global rest select value, and also single rests to show that they will be added
   function handleMinGlobalRestChange(e: any) {
     setMinGlobalRest(e.target.value);
     setMinSingleRest(e.target.value);
   }
 
-  //handle global rest select value, and also single rests to show that they will be added
+  // handle global rest select value, and also single rests to show that they will be added
   function handleSecGlobalRestChange(e: any) {
     setSecGlobalRest(e.target.value);
     setSecSingleRest(e.target.value);
   }
 
-  //handle round minutes
+  // handle round minutes
   function handleRoundMinChange(e: any) {
     setRoundMin(e.target.value);
   }
 
-  //handle round seconds
+  // handle round seconds
   function handleRoundSecChange(e: any) {
     setRoundSec(e.target.value);
   }
 
-  //handle single rest select value
+  // handle single rest select value
   function handleMinSingleRestChange(e: any) {
     setMinSingleRest(e.target.value);
   }
 
-  //handle single rest select value
+  // handle single rest select value
   function handleSecSingleRestChange(e: any) {
     setSecSingleRest(e.target.value);
   }
 
-  //this method will delete a round
+  // this method will delete a round
   function handleDeleteRound(id: string) {
     dispatch(removeRound(id));
   }
 
-  //creates options for the minutes select box
+  // creates options for the minutes select box
   const sixtyOptions = ONE_BY_ONE.map((elem: number) => (
     <option value={elem} key={elem}>
       {elem}
     </option>
   ));
 
-  //create options for the seconds select box
+  // create options for the seconds select box
   const twelveOptions = FIVE_BY_FIVE.map((elem: number) => (
     <option value={elem} key={elem}>
       {elem}
     </option>
   ));
 
-  //this variable is meant to show the next round on the routine
+  // this variable is meant to show the next round on the routine
   const nextActivity = () => {
     if (currentRound >= routine.length - 1) {
       return <div className='h-20 w-1 mb-4'></div>;
@@ -236,7 +234,7 @@ function App() {
     );
   };
 
-  //this variable is meant to render the routine
+  // this variable is meant to render the routine
   const activitiesList = routine.map((elem: any) => {
     const minutes = Math.floor(elem.time / 60);
     const seconds = elem.time % 60;
@@ -281,7 +279,7 @@ function App() {
               onClick={() => {
                 if (routine.length !== 0) {
                   dispatch(mount());
-                  handleHomeClose();
+                  setCloseHomeScreen(true);
                 }
               }}
             >
