@@ -9,12 +9,12 @@ import { ReactComponent as NextIcon } from '../assets/next.svg';
 import { ReactComponent as ReplayIcon } from '../assets/replay.svg';
 import { ReactComponent as RestoreIcon } from '../assets/restore.svg';
 
-interface IIconsProps {
+interface IconsProps {
   value: string;
   disable?: boolean;
 }
 
-function Icons(props: IIconsProps) {
+function Icons(props: IconsProps) {
   const Icon = () => {
     switch (props.value) {
       case 'delete':

@@ -5,17 +5,17 @@ import { unmount } from './mountCountdownSlice';
 
 import Icons from '../utils/icons';
 
-// This type will ensure the buttonState is a number with 3 possible values
+// this type will ensure the buttonState is a number with 3 possible values
 type ButtonDisable = 'left' | 'none' | 'right';
 
 function Countdown() {
   const dispatch = useAppDispatch();
 
   const routine = useAppSelector((state) => state.rotuine.value);
-  let currentRound = useAppSelector((state) => state.current.value);
+  let currentActivity = useAppSelector((state) => state.current.value);
 
   const time = routine ? routine[0].time : 0;
-  const label = routine[currentRound]?.label;
+  const label = routine[currentActivity]?.label;
   let [countdownTime, setCountdownTime] = useState(time);
   let [minutes, setMinutes] = useState(Math.floor(time / 60));
   let [seconds, setSeconds] = useState(time % 60);
@@ -23,11 +23,11 @@ function Countdown() {
   let [disableButton, setDisableButton] = useState<ButtonDisable>('left');
   let disableAllMoveButtons = routine.length === 0;
 
-  //this class variable will hold the setInterval, their only purpose is to be able to clear the interval
+  // this class variable will hold the setInterval, their only purpose is to be able to clear the interval
   let interval = useRef<number>();
 
-  //once the component mounts it will start a countdown, the original value is the one passed as a prop to
-  //the component and it will run until the 'countdownTime' is 0
+  // once the component mounts it will start a countdown, the original value is the one passed as a prop to
+  // the component and it will run until the 'countdownTime' is 0
   useEffect(() => {
     interval.current = window.setInterval(() => {
       if (countdownTime <= 0) {
@@ -49,55 +49,52 @@ function Countdown() {
   }, [countdownTime]);
 
   useEffect(() => {
-    if (currentRound < routine.length) {
-      setCountdownTime(routine[currentRound].time);
+    if (currentActivity < routine.length) {
+      setCountdownTime(routine[currentActivity].time);
     }
 
-    if (currentRound >= routine.length) {
+    if (currentActivity >= routine.length) {
       dispatch(unmount());
     }
 
-    if (currentRound === routine.length - 1) {
+    if (currentActivity === routine.length - 1) {
       setDisableButton('right');
-    } else if (currentRound === 0) {
+    } else if (currentActivity === 0) {
       setDisableButton('left');
     } else {
       setDisableButton('none');
     }
-  }, [currentRound, routine, dispatch]);
+  }, [currentActivity, routine, dispatch]);
 
-  //this function will remove the setInterval to stop the countdown
+  // this function will remove the setInterval to stop the countdown
   function stopCountdown() {
     clearInterval(interval.current);
     setCountdownTime(0);
     setIsPaused(true);
   }
 
-  //this function will restart the countdown
+  // this function will restart the countdown
   function resumeCountdown() {
     setIsPaused(false);
     setCountdownTime(time);
   }
 
-  //this function will restart the current round
-  function restartRound() {
+  // this function will restart the current activity
+  function restartActivity() {
     dispatch(restart());
-    setCountdownTime(routine[currentRound].time);
+    setCountdownTime(routine[currentActivity].time);
   }
 
-  //this function will unmount the current round and will mount the next round if there is one
-  function nextRound() {
+  // this function will unmount the current activity and will mount the next activity if there is one
+  function nextActivity() {
     dispatch(next());
   }
 
-  //this function will unmount the current round and will mount the previous round if there is one
-  function previousRound() {
+  // this function will unmount the current activity and will mount the previous activity if there is one
+  function previousActivity() {
     dispatch(previous());
-    setCountdownTime(routine[currentRound].time);
+    setCountdownTime(routine[currentActivity].time);
   }
-
-  //the buttons will now be controlled by the component, since I now moved the logic to navigate through
-  //the routine to this component instead of the timer component
 
   return (
     <div className='font-bold h-80 flex flex-col justify-center items-center'>
@@ -113,7 +110,7 @@ function Countdown() {
           <button
             className='rounded-full w-12 h-12 bg-gray-700 disabled:bg-gray-900'
             disabled={disableButton === 'left'}
-            onClick={previousRound}
+            onClick={previousActivity}
           >
             <Icons value={'previous'} disable={disableButton === 'left'} />
           </button>
@@ -121,7 +118,7 @@ function Countdown() {
 
         <button
           className='rounded-full w-14 h-14 bg-gray-700'
-          onClick={restartRound}
+          onClick={restartActivity}
         >
           <Icons value={'replay'} />
         </button>
@@ -144,7 +141,7 @@ function Countdown() {
           <button
             className='rounded-full w-12 h-12 bg-gray-700 disabled:bg-gray-900'
             disabled={disableButton === 'right'}
-            onClick={nextRound}
+            onClick={nextActivity}
           >
             <Icons value={'next'} disable={disableButton === 'right'} />
           </button>

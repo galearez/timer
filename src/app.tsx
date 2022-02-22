@@ -29,7 +29,7 @@ function App() {
   const dispatch = useAppDispatch();
   // these are global states controlled by redux
   let routine = useAppSelector((state) => state.rotuine.value);
-  let currentRound = useAppSelector((state) => state.current.value);
+  let currentActivity = useAppSelector((state) => state.current.value);
   let mountCountdown = useAppSelector((state) => state.mountCountdown.value);
   // these states control the current round time
   let [activityMin, setActivityMin] = useState('0');
@@ -47,12 +47,12 @@ function App() {
   // this state is meant to unmount the home UI and mount/unmount the countdown component
   let [closeHomeScreen, setCloseHomeScreen] = useState(false);
   // this state is meant to be use on naming when the user don't specify an activity name
-  let [roundDefaultName, setRoundDefaultName] = useState(1);
+  let [activityDefaultName, setActivityDefaultName] = useState(1);
 
   // user input box references
   let labelRef: React.RefObject<HTMLInputElement> = useRef(null);
-  let roundMinRef: React.RefObject<HTMLSelectElement> = useRef(null);
-  let roundSecRef: React.RefObject<HTMLSelectElement> = useRef(null);
+  let activityMinRef: React.RefObject<HTMLSelectElement> = useRef(null);
+  let activitySecRef: React.RefObject<HTMLSelectElement> = useRef(null);
   let restMinRef: React.RefObject<HTMLSelectElement> = useRef(null);
   let restSecRef: React.RefObject<HTMLSelectElement> = useRef(null);
 
@@ -122,7 +122,7 @@ function App() {
     );
 
     // once a round is created it adds one to the counter
-    setRoundDefaultName((prev) => prev + 1);
+    setActivityDefaultName((prev) => prev + 1);
 
     // add a rest after the round if the user has one of the add Rest switches enabled, it is like this
     // because that way the user can turn off the global rest if they don't need it between rounds
@@ -134,8 +134,8 @@ function App() {
     // they will be reset to 0
     setMinSingleRest(minGlobalRest);
     setSecSingleRest(secGlobalRest);
-    setRoundMin('0');
-    setRoundSec('0');
+    setActivityMin('0');
+    setActivitySec('0');
 
     // close the input form modal
     if (screenWidth < 768) {
@@ -184,10 +184,10 @@ function App() {
 
   // this variable is meant to show the next round on the routine
   const nextActivity = () => {
-    if (currentRound >= routine.length - 1) {
+    if (currentActivity >= routine.length - 1) {
       return <div className='h-20 w-1 mb-4'></div>;
     }
-    const elem = routine[currentRound + 1];
+    const elem = routine[currentActivity + 1];
     const minutes = Math.floor(elem.time / 60);
     const seconds = elem.time % 60;
 
@@ -342,10 +342,10 @@ function App() {
               onSubmit={(event) =>
                 handleUserInput(
                   event,
-                  roundDefaultName,
+                  activityDefaultName,
                   labelRef,
-                  roundMinRef,
-                  roundSecRef,
+                  activityMinRef,
+                  activitySecRef,
                   restMinRef,
                   restSecRef
                 )
@@ -359,7 +359,7 @@ function App() {
                     type='text'
                     className='form-input mt-1'
                     ref={labelRef}
-                    placeholder={`Round ${roundDefaultName}`}
+                    placeholder={`Activity ${activityDefaultName}`}
                   />
                 </label>
               </fieldset>
@@ -368,11 +368,11 @@ function App() {
                   Minutes
                   <select
                     className='form-select flex-none'
-                    ref={roundMinRef}
-                    value={roundMin}
+                    ref={activityMinRef}
                     onChange={(e) => {
                       setActivityMin(e.target.value);
                     }}
+                    value={activityMin}
                   >
                     {sixtyOptions}
                   </select>
@@ -381,11 +381,11 @@ function App() {
                   Seconds
                   <select
                     className='form-select flex-none'
-                    ref={roundSecRef}
-                    value={roundSec}
+                    ref={activitySecRef}
                     onChange={(e) => {
                       setActivitySec(e.target.value);
                     }}
+                    value={activitySec}
                   >
                     {twelveOptions}
                   </select>

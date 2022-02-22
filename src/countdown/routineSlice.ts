@@ -1,14 +1,14 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../app/store';
 
-interface IRound {
+interface Activity {
   id: string;
   label: string;
   time: number;
 }
 
 type IntialState = {
-  value: IRound[];
+  value: Activity[];
 };
 
 const routineSlice = createSlice({
@@ -17,7 +17,7 @@ const routineSlice = createSlice({
     value: [],
   } as IntialState,
   reducers: {
-    addRound: (state, action: PayloadAction<IRound>) => {
+    addRound: (state, action: PayloadAction<Activity>) => {
       state.value = [...state.value, action.payload];
     },
     removeRound: (state, action: PayloadAction<string>) => {
