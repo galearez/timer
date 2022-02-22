@@ -32,10 +32,16 @@ function App() {
   let currentRound = useAppSelector((state) => state.current.value);
   let mountCountdown = useAppSelector((state) => state.mountCountdown.value);
   // these states control the current round time
+  let [activityMin, setActivityMin] = useState('0');
+  let [activitySec, setActivitySec] = useState('0');
   // these states control when the user selects to add a rest after each avtivity
   let [globalRests, setGlobalRests] = useState(false);
+  let [minGlobalRest, setMinGlobalRest] = useState('0');
+  let [secGlobalRest, setSecGlobalRest] = useState('0');
   // these states control when the user selects to add a rest after the current activity
   let [singleRest, setSingleRest] = useState(false);
+  let [minSingleRest, setMinSingleRest] = useState('0');
+  let [secSingleRest, setSecSingleRest] = useState('0');
   // this state is a boolean becuase is used to show the main input form based on the viewport size
   let [activityForm, setActivityForm] = useState(false);
   // this state is meant to unmount the home UI and mount/unmount the countdown component
@@ -155,38 +161,6 @@ function App() {
       default:
         break;
     }
-  }
-
-  // handle global rest select value, and also single rests to show that they will be added
-  function handleMinGlobalRestChange(e: any) {
-    setMinGlobalRest(e.target.value);
-    setMinSingleRest(e.target.value);
-  }
-
-  // handle global rest select value, and also single rests to show that they will be added
-  function handleSecGlobalRestChange(e: any) {
-    setSecGlobalRest(e.target.value);
-    setSecSingleRest(e.target.value);
-  }
-
-  // handle round minutes
-  function handleRoundMinChange(e: any) {
-    setRoundMin(e.target.value);
-  }
-
-  // handle round seconds
-  function handleRoundSecChange(e: any) {
-    setRoundSec(e.target.value);
-  }
-
-  // handle single rest select value
-  function handleMinSingleRestChange(e: any) {
-    setMinSingleRest(e.target.value);
-  }
-
-  // handle single rest select value
-  function handleSecSingleRestChange(e: any) {
-    setSecSingleRest(e.target.value);
   }
 
   // this method will delete a round
@@ -314,7 +288,10 @@ function App() {
                   <select
                     value={minGlobalRest}
                     className='form-select flex-none'
-                    onChange={handleMinGlobalRestChange}
+                    onChange={(e) => {
+                      setMinGlobalRest(e.target.value);
+                      setMinSingleRest(e.target.value);
+                    }}
                     disabled={!globalRests}
                   >
                     {sixtyOptions}
@@ -325,7 +302,10 @@ function App() {
                   <select
                     value={secGlobalRest}
                     className='form-select flex-none'
-                    onChange={handleSecGlobalRestChange}
+                    onChange={(e) => {
+                      setSecGlobalRest(e.target.value);
+                      setSecSingleRest(e.target.value);
+                    }}
                     disabled={!globalRests}
                   >
                     {twelveOptions}
@@ -389,8 +369,10 @@ function App() {
                   <select
                     className='form-select flex-none'
                     ref={roundMinRef}
-                    onChange={handleRoundMinChange}
                     value={roundMin}
+                    onChange={(e) => {
+                      setActivityMin(e.target.value);
+                    }}
                   >
                     {sixtyOptions}
                   </select>
@@ -400,8 +382,10 @@ function App() {
                   <select
                     className='form-select flex-none'
                     ref={roundSecRef}
-                    onChange={handleRoundSecChange}
                     value={roundSec}
+                    onChange={(e) => {
+                      setActivitySec(e.target.value);
+                    }}
                   >
                     {twelveOptions}
                   </select>
@@ -426,7 +410,9 @@ function App() {
                       className='form-select flex-none'
                       ref={restMinRef}
                       value={minSingleRest}
-                      onChange={handleMinSingleRestChange}
+                      onChange={(e) => {
+                        setMinSingleRest(e.target.value);
+                      }}
                       disabled={!singleRest}
                     >
                       {sixtyOptions}
@@ -438,7 +424,9 @@ function App() {
                       className='form-select flex-none'
                       ref={restSecRef}
                       value={secSingleRest}
-                      onChange={handleSecSingleRestChange}
+                      onChange={(e) => {
+                        setSecSingleRest(e.target.value);
+                      }}
                       disabled={!singleRest}
                     >
                       {twelveOptions}
