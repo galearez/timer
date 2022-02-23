@@ -136,6 +136,11 @@ function App() {
     setSecSingleRest(secGlobalRest);
     setActivityMin('0');
     setActivitySec('0');
+    if (!globalRests) {
+      setSingleRest(false);
+    } else {
+      setSingleRest(true);
+    }
 
     // close the input form modal
     if (screenWidth < 768) {
@@ -397,7 +402,7 @@ function App() {
                   <label className='toggle-switch '>
                     <input
                       type='checkbox'
-                      onClick={() => handleToggleFieldset('singleRest')}
+                      onChange={() => handleToggleFieldset('singleRest')}
                       checked={singleRest}
                     />
                     <span className='slider'></span>
