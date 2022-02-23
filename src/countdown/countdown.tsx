@@ -21,7 +21,7 @@ function Countdown() {
   let [seconds, setSeconds] = useState(time % 60);
   let [isPaused, setIsPaused] = useState(false);
   let [disableButton, setDisableButton] = useState<ButtonDisable>('left');
-  let disableAllMoveButtons = routine.length === 0;
+  let disableAllMoveButtons = routine.length === 1;
 
   // this class variable will hold the setInterval, their only purpose is to be able to clear the interval
   let interval = useRef<number>();
@@ -33,9 +33,8 @@ function Countdown() {
       if (countdownTime <= 0) {
         dispatch(next());
         clearInterval(interval.current);
-      } else {
-        setCountdownTime(countdownTime - 1);
       }
+      setCountdownTime(countdownTime - 1);
     }, 1000);
 
     return () => {
@@ -69,14 +68,17 @@ function Countdown() {
   // this function will remove the setInterval to stop the countdown
   function stopCountdown() {
     clearInterval(interval.current);
-    setCountdownTime(0);
     setIsPaused(true);
   }
 
   // this function will restart the countdown
   function resumeCountdown() {
     setIsPaused(false);
-    setCountdownTime(time);
+    let resume: any = setTimeout(() => {
+      setCountdownTime(countdownTime - 1);
+
+      return clearTimeout(resume);
+    }, 1000);
   }
 
   // this function will restart the current activity
@@ -88,12 +90,18 @@ function Countdown() {
   // this function will unmount the current activity and will mount the next activity if there is one
   function nextActivity() {
     dispatch(next());
+    if (isPaused) {
+      setIsPaused(false);
+    }
   }
 
   // this function will unmount the current activity and will mount the previous activity if there is one
   function previousActivity() {
     dispatch(previous());
     setCountdownTime(routine[currentActivity].time);
+    if (isPaused) {
+      setIsPaused(false);
+    }
   }
 
   return (
