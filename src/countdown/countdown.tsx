@@ -25,22 +25,37 @@ function Countdown() {
 
   // this class variable will hold the setInterval, their only purpose is to be able to clear the interval
   let interval = useRef<number>();
+  const oneSecond = 1000;
+  let [expectedTime, setExpectedTime] = useState(Date.now() + oneSecond);
+  let [intervalTime, setIntervalTime] = useState(oneSecond);
 
   // once the component mounts it will start a countdown, the original value is the one passed as a prop to
   // the component and it will run until the 'countdownTime' is 0
   useEffect(() => {
     interval.current = window.setInterval(() => {
+      let drift = Date.now() - expectedTime;
+      if (drift > oneSecond) {
+        clearInterval(interval.current);
+        window.confirm(
+          'Something went wrong. \n Do you you want to refresh your tab?'
+        ) && window.location.reload();
+        return;
+      }
+
       if (countdownTime <= 0) {
         dispatch(next());
         clearInterval(interval.current);
       }
+
       setCountdownTime(countdownTime - 1);
-    }, 1000);
+      setExpectedTime((prevState) => prevState + oneSecond);
+      setIntervalTime(Math.max(0, intervalTime - drift));
+    }, intervalTime);
 
     return () => {
       clearInterval(interval.current);
     };
-  }, [countdownTime, dispatch]);
+  }, [countdownTime, dispatch, intervalTime, expectedTime, oneSecond]);
 
   useEffect(() => {
     setMinutes(Math.floor(countdownTime / 60));
