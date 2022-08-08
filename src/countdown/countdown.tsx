@@ -64,6 +64,7 @@ function Countdown() {
 
   useEffect(() => {
     if (currentActivity < routine.length) {
+      setExpectedTime(Date.now() + oneSecond);
       setCountdownTime(routine[currentActivity].time);
     }
 
@@ -91,6 +92,7 @@ function Countdown() {
     setIsPaused(false);
     let resume: any = setTimeout(() => {
       setCountdownTime(countdownTime - 1);
+      setExpectedTime(Date.now() + oneSecond);
 
       return clearTimeout(resume);
     }, 1000);
@@ -100,6 +102,7 @@ function Countdown() {
   function restartActivity() {
     dispatch(restart());
     setCountdownTime(routine[currentActivity].time);
+    setExpectedTime(Date.now() + oneSecond);
   }
 
   // this function will unmount the current activity and will mount the next activity if there is one
