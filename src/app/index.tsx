@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useAppSelector, useAppDispatch } from './app/hooks';
-import { addRound, removeRound } from './countdown/routine-slice';
-import { mount } from './countdown/mount-countdown-slice';
-import { restart } from './countdown/current-slice';
-import Countdown from './countdown/countdown';
+import { useAppSelector, useAppDispatch } from '../hooks';
+import { addRound, removeRound } from './routine-slice';
+import { mount } from './mount-countdown-slice';
+import { restart } from '../countdown/current-slice';
+import Countdown from '../countdown/countdown';
 import { v4 as uuidv4 } from 'uuid';
 import clsx from 'clsx';
 
-import Icons from './utils/icons';
+import Icons from '../utils/icons';
 
 //before this change this two arrays where auto-generated on component mounting, but there was a big problem
 //it needs to 'update' before generating the options for the select box so when using it on desktop there
