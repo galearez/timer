@@ -151,21 +151,13 @@ export default function App() {
   // this function will handle all the fields where the input can add data, they will only be rendered
   // once the user need them in mobile, in screens > 768, they will be rendered by default and the only
   // conditional rendering will be the other components
-  function handleToggleFieldset(field: string) {
-    switch (field) {
-      case 'globalRests':
-        setGlobalRests(!globalRests);
-        setSingleRest(!globalRests);
-        break;
-      case 'activityForm':
-        setActivityForm(!activityForm);
-        break;
-      case 'singleRest':
-        setSingleRest(!singleRest);
-        break;
-      default:
-        break;
-    }
+  function handleToggleFieldset(
+    field: 'globalRests' | 'activityForm' | 'singleRest'
+  ) {
+    if (field === 'activityForm') return setActivityForm(!activityForm);
+    if (field === 'singleRest') return setSingleRest(!singleRest);
+    setGlobalRests(!globalRests);
+    setSingleRest(!globalRests);
   }
 
   // this method will delete a round
