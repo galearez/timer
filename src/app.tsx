@@ -23,7 +23,7 @@ const ONE_BY_ONE = [
 
 // this component will handle the user input and will pass main data, rounds (id, label and time)
 // to the other components
-function App() {
+export default function App() {
   let [screenWidth, setScreenWidth] = useState(window.innerWidth);
 
   const dispatch = useAppDispatch();
@@ -187,32 +187,6 @@ function App() {
     </option>
   ));
 
-  // this variable is meant to show the next round on the routine
-  const nextActivity = () => {
-    if (currentActivity >= routine.length - 1) {
-      return <div className='h-20 w-1 mb-4'></div>;
-    }
-    const elem = routine[currentActivity + 1];
-    const minutes = Math.floor(elem.time / 60);
-    const seconds = elem.time % 60;
-
-    return (
-      <div className='bg-gray-700 rounded-md mb-4'>
-        <h2 className='pt-2 px-2'>Next</h2>
-
-        <div className='w-full p-2 flex justify-between items-center flex-nowrap text-lg'>
-          <span>{elem.label}</span>
-          <div className='flex items-center'>
-            <span>
-              {minutes < 10 ? <span>0{minutes}</span> : <span>{minutes}</span>}:
-              {seconds < 10 ? <span>0{seconds}</span> : <span>{seconds}</span>}
-            </span>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   // this variable is meant to render the routine
   const activitiesList = routine.map((elem: any) => {
     const minutes = Math.floor(elem.time / 60);
@@ -221,8 +195,7 @@ function App() {
     return (
       <div
         key={elem.id}
-        className='w-full bg-gray-700 rounded-md p-2 mb-2 flex justify-between items-center flex-nowrap text-lg'
-      >
+        className='w-full bg-gray-700 rounded-md p-2 mb-2 flex justify-between items-center flex-nowrap text-lg'>
         <span>{elem.label}</span>
         <div className='flex items-center'>
           <span>
@@ -233,8 +206,7 @@ function App() {
             className='inline-block ml-3'
             onClick={() => {
               handleDeleteRound(elem.id);
-            }}
-          >
+            }}>
             <Icons value={'delete'} />
           </span>
         </div>
@@ -248,8 +220,7 @@ function App() {
         className={clsx(
           'flex flex-col justify-between',
           closeHomeScreen ? 'h-screen' : 'h-auto'
-        )}
-      >
+        )}>
         <header className='flex justify-between items-center'>
           <h1>Timer</h1>
           {!closeHomeScreen ? (
@@ -260,15 +231,13 @@ function App() {
                   dispatch(mount());
                   setCloseHomeScreen(true);
                 }
-              }}
-            >
+              }}>
               Start routine
             </button>
           ) : (
             <button
               className='font-bold text-white py-2 px-4 rounded-md bg-gray-700'
-              onClick={() => dispatch(restart())}
-            >
+              onClick={() => dispatch(restart())}>
               Restart all <Icons value={'restore'} />
             </button>
           )}
@@ -297,8 +266,7 @@ function App() {
                       setMinGlobalRest(e.target.value);
                       setMinSingleRest(e.target.value);
                     }}
-                    disabled={!globalRests}
-                  >
+                    disabled={!globalRests}>
                     {sixtyOptions}
                   </select>
                 </label>
@@ -311,8 +279,7 @@ function App() {
                       setSecGlobalRest(e.target.value);
                       setSecSingleRest(e.target.value);
                     }}
-                    disabled={!globalRests}
-                  >
+                    disabled={!globalRests}>
                     {twelveOptions}
                   </select>
                 </label>
@@ -330,8 +297,7 @@ function App() {
                 if (globalRests) {
                   setSingleRest(true);
                 }
-              }}
-            >
+              }}>
               New Round
             </button>
           </div>
@@ -340,8 +306,7 @@ function App() {
           <div className='absolute md:relative top-0 left-0 w-full h-full'>
             <div
               className='absolute md:hidden top-0 left-0 w-full h-full bg-gray-50 bg-opacity-30'
-              onClick={() => handleToggleFieldset('activityForm')}
-            ></div>
+              onClick={() => handleToggleFieldset('activityForm')}></div>
             <form
               className='bg-gray-800 w-11/12 md:w-full p-2 md:p-0 rounded-md absolute md:relative top-1/2 left-1/2 md:top-auto md:left-auto transform -translate-y-1/2 -translate-x-1/2 md:transform-none'
               onSubmit={(event) =>
@@ -354,8 +319,7 @@ function App() {
                   restMinRef,
                   restSecRef
                 )
-              }
-            >
+              }>
               <h2>Round</h2>
               <fieldset>
                 <label className='flex flex-col'>
@@ -377,8 +341,7 @@ function App() {
                     onChange={(e) => {
                       setActivityMin(e.target.value);
                     }}
-                    value={activityMin}
-                  >
+                    value={activityMin}>
                     {sixtyOptions}
                   </select>
                 </label>
@@ -390,8 +353,7 @@ function App() {
                     onChange={(e) => {
                       setActivitySec(e.target.value);
                     }}
-                    value={activitySec}
-                  >
+                    value={activitySec}>
                     {twelveOptions}
                   </select>
                 </label>
@@ -418,8 +380,7 @@ function App() {
                       onChange={(e) => {
                         setMinSingleRest(e.target.value);
                       }}
-                      disabled={!singleRest}
-                    >
+                      disabled={!singleRest}>
                       {sixtyOptions}
                     </select>
                   </label>
@@ -432,8 +393,7 @@ function App() {
                       onChange={(e) => {
                         setSecSingleRest(e.target.value);
                       }}
-                      disabled={!singleRest}
-                    >
+                      disabled={!singleRest}>
                       {twelveOptions}
                     </select>
                   </label>
@@ -441,8 +401,7 @@ function App() {
               </fieldset>
               <button
                 type='submit'
-                className='font-bold text-white block w-3/5 py-2 px-4 m-auto rounded-md bg-gradient-to-r from-mint to-lime'
-              >
+                className='font-bold text-white block w-3/5 py-2 px-4 m-auto rounded-md bg-gradient-to-r from-mint to-lime'>
                 Add round
               </button>
             </form>
@@ -459,11 +418,50 @@ function App() {
             )}
           </div>
         )}
-        {closeHomeScreen && nextActivity()}
+        {closeHomeScreen && (
+          <NextActivity currentActivity={currentActivity} routine={routine} />
+        )}
       </div>
       <div className='mt-2'>{activitiesList}</div>
     </div>
   );
 }
 
-export default App;
+// this variable is meant to show the next round on the routine
+interface Activities {
+  id: string;
+  label: string;
+  time: number;
+}
+
+interface NextActivityProps {
+  currentActivity: number;
+  routine: Activities[];
+}
+
+function NextActivity(props: NextActivityProps) {
+  const { currentActivity, routine } = props;
+
+  if (currentActivity >= routine.length - 1) {
+    return <div className='h-20 w-1 mb-4'></div>;
+  }
+  const elem = routine[currentActivity + 1];
+  const minutes = Math.floor(elem.time / 60);
+  const seconds = elem.time % 60;
+
+  return (
+    <div className='bg-gray-700 rounded-md mb-4'>
+      <h2 className='pt-2 px-2'>Next</h2>
+
+      <div className='w-full p-2 flex justify-between items-center flex-nowrap text-lg'>
+        <span>{elem.label}</span>
+        <div className='flex items-center'>
+          <span>
+            {minutes < 10 ? <span>0{minutes}</span> : <span>{minutes}</span>}:
+            {seconds < 10 ? <span>0{seconds}</span> : <span>{seconds}</span>}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
