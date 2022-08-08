@@ -25,37 +25,38 @@ function Countdown() {
 
   // this class variable will hold the setInterval, their only purpose is to be able to clear the interval
   let interval = useRef<number>();
-  const oneSecond = 1000;
-  let [expectedTime, setExpectedTime] = useState(Date.now() + oneSecond);
-  let [intervalTime, setIntervalTime] = useState(oneSecond);
+  const ONE_SECOND = 1000;
+  let [expectedTime, setExpectedTime] = useState(Date.now() + ONE_SECOND);
+  let [intervalTime, setIntervalTime] = useState(ONE_SECOND);
 
   // once the component mounts it will start a countdown, the original value is the one passed as a prop to
   // the component and it will run until the 'countdownTime' is 0
   useEffect(() => {
     interval.current = window.setInterval(() => {
       let drift = Date.now() - expectedTime;
-      if (drift > oneSecond) {
+      if (drift > ONE_SECOND) {
         clearInterval(interval.current);
-        window.confirm(
-          'Something went wrong. \n Do you you want to refresh your tab?'
-        ) && window.location.reload();
-        return;
+        return (
+          window.confirm(
+            'Something went wrong. \n Do you you want to refresh your tab?'
+          ) && window.location.reload()
+        );
       }
 
       if (countdownTime <= 0) {
         dispatch(next());
-        clearInterval(interval.current);
+        return clearInterval(interval.current);
       }
 
       setCountdownTime(countdownTime - 1);
-      setExpectedTime((prevState) => prevState + oneSecond);
+      setExpectedTime((prevState) => prevState + ONE_SECOND);
       setIntervalTime(Math.max(0, intervalTime - drift));
     }, intervalTime);
 
     return () => {
       clearInterval(interval.current);
     };
-  }, [countdownTime, dispatch, intervalTime, expectedTime, oneSecond]);
+  }, [countdownTime, dispatch, intervalTime, expectedTime, ONE_SECOND]);
 
   useEffect(() => {
     setMinutes(Math.floor(countdownTime / 60));
@@ -64,7 +65,7 @@ function Countdown() {
 
   useEffect(() => {
     if (currentActivity < routine.length) {
-      setExpectedTime(Date.now() + oneSecond);
+      setExpectedTime(Date.now() + ONE_SECOND);
       setCountdownTime(routine[currentActivity].time);
     }
 
@@ -92,7 +93,7 @@ function Countdown() {
     setIsPaused(false);
     let resume: any = setTimeout(() => {
       setCountdownTime(countdownTime - 1);
-      setExpectedTime(Date.now() + oneSecond);
+      setExpectedTime(Date.now() + ONE_SECOND);
 
       return clearTimeout(resume);
     }, 1000);
@@ -100,9 +101,8 @@ function Countdown() {
 
   // this function will restart the current activity
   function restartActivity() {
-    dispatch(restart());
     setCountdownTime(routine[currentActivity].time);
-    setExpectedTime(Date.now() + oneSecond);
+    setExpectedTime(Date.now() + ONE_SECOND);
   }
 
   // this function will unmount the current activity and will mount the next activity if there is one
@@ -136,30 +136,26 @@ function Countdown() {
           <button
             className='rounded-full w-12 h-12 bg-gray-700 disabled:bg-gray-900'
             disabled={disableButton === 'left'}
-            onClick={previousActivity}
-          >
+            onClick={previousActivity}>
             <Icons value={'previous'} disable={disableButton === 'left'} />
           </button>
         )}
 
         <button
           className='rounded-full w-14 h-14 bg-gray-700'
-          onClick={restartActivity}
-        >
+          onClick={restartActivity}>
           <Icons value={'replay'} />
         </button>
         {isPaused ? (
           <button
             className='rounded-full w-16 h-16 bg-mint'
-            onClick={resumeCountdown}
-          >
+            onClick={resumeCountdown}>
             <Icons value={'play'} />
           </button>
         ) : (
           <button
             className='rounded-full w-16 h-16 bg-gray-700'
-            onClick={stopCountdown}
-          >
+            onClick={stopCountdown}>
             <Icons value={'pause'} />
           </button>
         )}
@@ -167,8 +163,7 @@ function Countdown() {
           <button
             className='rounded-full w-12 h-12 bg-gray-700 disabled:bg-gray-900'
             disabled={disableButton === 'right'}
-            onClick={nextActivity}
-          >
+            onClick={nextActivity}>
             <Icons value={'next'} disable={disableButton === 'right'} />
           </button>
         )}
