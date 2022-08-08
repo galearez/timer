@@ -28,7 +28,7 @@ export default function App() {
 
   const dispatch = useAppDispatch();
   // these are global states controlled by redux
-  let routine = useAppSelector((state) => state.rotuine.value);
+  let routine = useAppSelector((state) => state.routine.value);
   let currentActivity = useAppSelector((state) => state.current.value);
   let mountCountdown = useAppSelector((state) => state.mountCountdown.value);
   // these states control the current round time

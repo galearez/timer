@@ -6,7 +6,7 @@ import TimerControls from './timer-controls';
 
 export default function Countdown() {
   const dispatch = useAppDispatch();
-  const routine = useAppSelector((state) => state.rotuine.value);
+  const routine = useAppSelector((state) => state.routine.value);
   let currentActivity = useAppSelector((state) => state.current.value);
 
   const time = routine ? routine[0].time : 0;

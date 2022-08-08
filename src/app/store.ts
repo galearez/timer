@@ -5,7 +5,7 @@ import mountCountdownSlice from '../countdown/mount-countdown-slice';
 
 const store = configureStore({
   reducer: {
-    rotuine: routineSlice,
+    routine: routineSlice,
     current: currentSlice,
     mountCountdown: mountCountdownSlice,
   },

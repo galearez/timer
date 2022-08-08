@@ -28,5 +28,5 @@ const routineSlice = createSlice({
 });
 
 export const { addRound, removeRound } = routineSlice.actions;
-export const selectRoutine = (state: RootState) => state.rotuine.value;
+export const selectRoutine = (state: RootState) => state.routine.value;
 export default routineSlice.reducer;
