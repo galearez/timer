@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
-import routineSlice from '../countdown/routineSlice';
-import currentSlice from '../countdown/currentSlice';
-import mountCountdownSlice from '../countdown/mountCountdownSlice';
+import routineSlice from '../countdown/routine-slice';
+import currentSlice from '../countdown/current-slice';
+import mountCountdownSlice from '../countdown/mount-countdown-slice';
 
 const store = configureStore({
   reducer: {

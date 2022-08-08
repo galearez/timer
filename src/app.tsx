@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useAppSelector, useAppDispatch } from './app/hooks';
-import { addRound, removeRound } from './countdown/routineSlice';
-import { mount } from './countdown/mountCountdownSlice';
-import { restart } from './countdown/currentSlice';
+import { addRound, removeRound } from './countdown/routine-slice';
+import { mount } from './countdown/mount-countdown-slice';
+import { restart } from './countdown/current-slice';
 import Countdown from './countdown/countdown';
 import { v4 as uuidv4 } from 'uuid';
 import clsx from 'clsx';
