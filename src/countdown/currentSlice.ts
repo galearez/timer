@@ -7,13 +7,13 @@ const currentSlice = createSlice({
     value: 0,
   },
   reducers: {
-    next: (state) => {
+    next(state) {
       state.value = state.value + 1;
     },
-    previous: (state) => {
+    previous(state) {
       state.value = state.value - 1;
     },
-    restart: (state) => {
+    restart(state) {
       state.value = 0;
     },
   },

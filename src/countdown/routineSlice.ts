@@ -17,10 +17,10 @@ const routineSlice = createSlice({
     value: [],
   } as IntialState,
   reducers: {
-    addRound: (state, action: PayloadAction<Activity>) => {
+    addRound(state, action: PayloadAction<Activity>) {
       state.value = [...state.value, action.payload];
     },
-    removeRound: (state, action: PayloadAction<string>) => {
+    removeRound(state, action: PayloadAction<string>) {
       let match = state.value.filter((round) => round.id !== action.payload);
       state.value = match;
     },
