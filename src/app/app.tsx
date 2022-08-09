@@ -69,17 +69,15 @@ export default function App() {
 
   // when screen resize it will be called to change the screenWidth state which control some responsive rendering
   useEffect(() => {
-    if (screenWidth > 767 && !activityForm) {
-      setActivityForm(true);
-      return;
+    if (screenWidth > 767) {
+      return setActivityForm(true);
     }
 
     //if the user shrinks the screen below 768 it will close the activity form component
-    if (screenWidth < 768 && activityForm) {
-      setActivityForm(false);
-      return;
+    if (screenWidth < 768) {
+      return setActivityForm(false);
     }
-  }, [screenWidth, activityForm]);
+  }, [screenWidth]);
 
   // just because I don't want to have a big parameter list on 'handleUserInput' I created this
   // type which is meant to be used with rest parameters
