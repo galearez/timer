@@ -56,4 +56,7 @@
   .toggle-switch input:checked + .slider::before {
     transform: translateX(24px);
   }
+  input:checked ~ .radio {
+    @apply text-white bg-mint;
+  }
 }

@@ -246,8 +246,8 @@ export default function App() {
               </label>
             </fieldset>
             {globalRests && (
-              <fieldset className='flex items-end'>
-                <div>
+              <fieldset className='grid grid-cols-3 sm:grid-cols-6 gap-3 mt-1 sm:my-2'>
+                <div className=' rounded-lg bg-gray-700 hover:bg-opacity-75'>
                   <input
                     type='radio'
                     name='rest'
@@ -257,10 +257,15 @@ export default function App() {
                       setSecGlobalRest(e.target.value);
                       setSecSingleRest(e.target.value);
                     }}
+                    hidden
                   />
-                  <label htmlFor='rest-5'>5 s</label>
+                  <label
+                    htmlFor='rest-5'
+                    className='radio block text-center font-semibold py-2 px-4 rounded-lg cursor-pointer'>
+                    5 s
+                  </label>
                 </div>
-                <div>
+                <div className=' rounded-lg bg-gray-700 hover:bg-opacity-75'>
                   <input
                     type='radio'
                     name='rest'
@@ -270,10 +275,15 @@ export default function App() {
                       setSecGlobalRest(e.target.value);
                       setSecSingleRest(e.target.value);
                     }}
+                    hidden
                   />
-                  <label htmlFor='rest-10'>10 s</label>
+                  <label
+                    htmlFor='rest-10'
+                    className='radio block text-center font-semibold py-2 px-4 rounded-lg cursor-pointer'>
+                    10 s
+                  </label>
                 </div>
-                <div>
+                <div className=' rounded-lg bg-gray-700 hover:bg-opacity-75'>
                   <input
                     type='radio'
                     name='rest'
@@ -283,10 +293,15 @@ export default function App() {
                       setSecGlobalRest(e.target.value);
                       setSecSingleRest(e.target.value);
                     }}
+                    hidden
                   />
-                  <label htmlFor='rest-20'>20 s</label>
+                  <label
+                    htmlFor='rest-20'
+                    className='radio block text-center font-semibold py-2 px-4 rounded-lg cursor-pointer'>
+                    20 s
+                  </label>
                 </div>
-                <div>
+                <div className=' rounded-lg bg-gray-700 hover:bg-opacity-75'>
                   <input
                     type='radio'
                     name='rest'
@@ -296,10 +311,15 @@ export default function App() {
                       setSecGlobalRest(e.target.value);
                       setSecSingleRest(e.target.value);
                     }}
+                    hidden
                   />
-                  <label htmlFor='rest-30'>30 s</label>
+                  <label
+                    htmlFor='rest-30'
+                    className='radio block text-center font-semibold py-2 px-4 rounded-lg cursor-pointer'>
+                    30 s
+                  </label>
                 </div>
-                <div>
+                <div className=' rounded-lg bg-gray-700 hover:bg-opacity-75'>
                   <input
                     type='radio'
                     name='rest'
@@ -309,10 +329,15 @@ export default function App() {
                       setSecGlobalRest(e.target.value);
                       setSecSingleRest(e.target.value);
                     }}
+                    hidden
                   />
-                  <label htmlFor='rest-45'>45 s</label>
+                  <label
+                    htmlFor='rest-45'
+                    className='radio block text-center font-semibold py-2 px-4 rounded-lg cursor-pointer'>
+                    45 s
+                  </label>
                 </div>
-                <div>
+                <div className=' rounded-lg bg-gray-700 hover:bg-opacity-75'>
                   <input
                     type='radio'
                     name='rest'
@@ -322,8 +347,13 @@ export default function App() {
                       setSecGlobalRest(e.target.value);
                       setSecSingleRest(e.target.value);
                     }}
+                    hidden
                   />
-                  <label htmlFor='rest-60'>60 s</label>
+                  <label
+                    htmlFor='rest-60'
+                    className='radio block text-center font-semibold py-2 px-4 rounded-lg cursor-pointer'>
+                    60 s
+                  </label>
                 </div>
               </fieldset>
             )}
