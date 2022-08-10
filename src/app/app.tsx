@@ -394,31 +394,103 @@ export default function App() {
                   />
                 </label>
               </fieldset>
-              <fieldset className='flex items-end mb-2'>
-                <label className='flex flex-col flex-1 mr-1'>
-                  Minutes
-                  <select
-                    className='form-select flex-none'
-                    ref={activityMinRef}
-                    onChange={(e) => {
-                      setActivityMin(e.target.value);
-                    }}
-                    value={activityMin}>
-                    {sixtyOptions}
-                  </select>
-                </label>
-                <label className='flex flex-col flex-1'>
-                  Seconds
-                  <select
-                    className='form-select flex-none'
-                    ref={activitySecRef}
-                    onChange={(e) => {
-                      setActivitySec(e.target.value);
-                    }}
-                    value={activitySec}>
-                    {twelveOptions}
-                  </select>
-                </label>
+              <fieldset className='grid grid-cols-3 sm:grid-cols-6 gap-3 my-3'>
+                <div className='rounded-lg bg-gray-700 hover:bg-opacity-75'>
+                  <input
+                    type='radio'
+                    name='activity'
+                    id='acivity-ten'
+                    value={10}
+                    hidden
+                    onChange={() => setActivitySec('10')}
+                    checked={activitySec === '10'}
+                  />
+                  <label
+                    htmlFor='acivity-ten'
+                    className='radio block font-semibold text-center py-2 px-4 rounded-lg cursor-pointer'>
+                    10 s
+                  </label>
+                </div>
+                <div className=' rounded-lg bg-gray-700 hover:bg-opacity-75'>
+                  <input
+                    type='radio'
+                    name='activity'
+                    id='activity-twenty'
+                    value={20}
+                    hidden
+                    onChange={() => setActivitySec('20')}
+                    checked={activitySec === '20'}
+                  />
+                  <label
+                    htmlFor='activity-twenty'
+                    className='radio block font-semibold text-center py-2 px-4 rounded-lg cursor-pointer'>
+                    20 s
+                  </label>
+                </div>
+                <div className=' rounded-lg bg-gray-700 hover:bg-opacity-75'>
+                  <input
+                    type='radio'
+                    name='activity'
+                    id='activity-thirty'
+                    value={30}
+                    hidden
+                    onChange={() => setActivitySec('30')}
+                    checked={activitySec === '30'}
+                  />
+                  <label
+                    htmlFor='activity-thirty'
+                    className='radio block font-semibold text-center py-2 px-4 rounded-lg cursor-pointer'>
+                    30 s
+                  </label>
+                </div>
+                <div className=' rounded-lg bg-gray-700 hover:bg-opacity-75'>
+                  <input
+                    type='radio'
+                    name='activity'
+                    id='activity-forty5'
+                    value={45}
+                    hidden
+                    onChange={() => setActivitySec('45')}
+                    checked={activitySec === '45'}
+                  />
+                  <label
+                    htmlFor='activity-forty5'
+                    className='radio block font-semibold text-center py-2 px-4 rounded-lg cursor-pointer'>
+                    45 s
+                  </label>
+                </div>
+                <div className=' rounded-lg bg-gray-700 hover:bg-opacity-75'>
+                  <input
+                    type='radio'
+                    name='activity'
+                    id='activity-sixty'
+                    value={60}
+                    hidden
+                    onChange={() => setActivitySec('60')}
+                    checked={activitySec === '60'}
+                  />
+                  <label
+                    htmlFor='activity-sixty'
+                    className='radio block font-semibold text-center py-2 px-4 rounded-lg cursor-pointer'>
+                    1 m
+                  </label>
+                </div>
+                <div className=' rounded-lg bg-gray-700 hover:bg-opacity-75'>
+                  <input
+                    type='radio'
+                    name='activity'
+                    id='activity-180'
+                    value={180}
+                    hidden
+                    onChange={() => setActivitySec('180')}
+                    checked={activitySec === '180'}
+                  />
+                  <label
+                    htmlFor='activity-180'
+                    className='radio block font-semibold text-center py-2 px-4 rounded-lg cursor-pointer'>
+                    3 m
+                  </label>
+                </div>
               </fieldset>
               <fieldset className='bg-gray-700 mb-2 px-2 pb-2 rounded-md'>
                 <span className='mt-1 flex justify-between items-center'>
