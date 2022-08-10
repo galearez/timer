@@ -83,8 +83,6 @@ export default function App() {
   // type which is meant to be used with rest parameters
   type SelectRefsArray = [
     React.RefObject<HTMLSelectElement>,
-    React.RefObject<HTMLSelectElement>,
-    React.RefObject<HTMLSelectElement>,
     React.RefObject<HTMLSelectElement>
   ];
 
@@ -101,12 +99,10 @@ export default function App() {
     // there will not be problem on parsing
     const activityMin = parseInt(selects[0].current?.value ?? '0');
     const activitySec = parseInt(selects[1].current?.value ?? '0');
-    const restMin = parseInt(selects[2].current?.value ?? '0');
-    const restSec = parseInt(selects[3].current?.value ?? '0');
+    const restTime = parseInt(secSingleRest ?? '0');
 
     // convert minutes and seconds to a single time value in seconds
     const activityTime = activityMin * 60 + activitySec;
-    const restTime = restMin * 60 + restSec;
     if (activityTime === 0) {
       return;
     }
