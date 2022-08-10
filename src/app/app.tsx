@@ -40,7 +40,6 @@ export default function App() {
   let [secGlobalRest, setSecGlobalRest] = useState('0');
   // these states control when the user selects to add a rest after the current activity
   let [singleRest, setSingleRest] = useState(false);
-  let [minSingleRest, setMinSingleRest] = useState('0');
   let [secSingleRest, setSecSingleRest] = useState('0');
   // this state is a boolean becuase is used to show the main input form based on the viewport size
   let [activityForm, setActivityForm] = useState(false);
@@ -53,8 +52,6 @@ export default function App() {
   let labelRef: React.RefObject<HTMLInputElement> = useRef(null);
   let activityMinRef: React.RefObject<HTMLSelectElement> = useRef(null);
   let activitySecRef: React.RefObject<HTMLSelectElement> = useRef(null);
-  let restMinRef: React.RefObject<HTMLSelectElement> = useRef(null);
-  let restSecRef: React.RefObject<HTMLSelectElement> = useRef(null);
 
   useEffect(() => {
     window.addEventListener('resize', () => setScreenWidth(window.innerWidth));
@@ -126,7 +123,6 @@ export default function App() {
 
     // reset the values of the single rests, if there are global rests, they will be reset to that value, if not
     // they will be reset to 0
-    setMinSingleRest(minGlobalRest);
     setSecSingleRest(secGlobalRest);
     setActivityMin('0');
     setActivitySec('0');
@@ -348,7 +344,7 @@ export default function App() {
                   <label
                     htmlFor='rest-60'
                     className='radio block text-center font-semibold py-2 px-4 rounded-lg cursor-pointer'>
-                    60 s
+                    1 m
                   </label>
                 </div>
               </fieldset>
@@ -383,9 +379,7 @@ export default function App() {
                   activityDefaultName,
                   labelRef,
                   activityMinRef,
-                  activitySecRef,
-                  restMinRef,
-                  restSecRef
+                  activitySecRef
                 )
               }>
               <h2>Round</h2>
@@ -426,7 +420,7 @@ export default function App() {
                   </select>
                 </label>
               </fieldset>
-              <fieldset className='bg-gray-700 mb-2 px-1 rounded-md'>
+              <fieldset className='bg-gray-700 mb-2 px-2 pb-2 rounded-md'>
                 <span className='mt-1 flex justify-between items-center'>
                   <h2>Rest</h2>
                   <label className='toggle-switch '>
@@ -438,34 +432,116 @@ export default function App() {
                     <span className='slider'></span>
                   </label>
                 </span>
-                <span className='flex items-end mb-2'>
-                  <label className='flex flex-col flex-1 mr-1'>
-                    Minutes
-                    <select
-                      className='form-select flex-none'
-                      ref={restMinRef}
-                      value={minSingleRest}
-                      onChange={(e) => {
-                        setMinSingleRest(e.target.value);
-                      }}
-                      disabled={!singleRest}>
-                      {sixtyOptions}
-                    </select>
-                  </label>
-                  <label className='flex flex-col flex-1'>
-                    Seconds
-                    <select
-                      className='form-select flex-none'
-                      ref={restSecRef}
-                      value={secSingleRest}
+                <div className='grid grid-cols-3 sm:grid-cols-6 gap-3 mt-1 sm:mt-2'>
+                  <div className=' rounded-lg bg-gray-500 hover:bg-opacity-75'>
+                    <input
+                      type='radio'
+                      name='round-rest'
+                      id='round-rest-5'
+                      value={5}
                       onChange={(e) => {
                         setSecSingleRest(e.target.value);
                       }}
-                      disabled={!singleRest}>
-                      {twelveOptions}
-                    </select>
-                  </label>
-                </span>
+                      checked={secSingleRest === '5'}
+                      hidden
+                    />
+                    <label
+                      htmlFor='round-rest-5'
+                      className='radio block text-center font-semibold py-2 px-4 rounded-lg cursor-pointer'>
+                      5 s
+                    </label>
+                  </div>
+                  <div className=' rounded-lg bg-gray-500 hover:bg-opacity-75'>
+                    <input
+                      type='radio'
+                      name='round-rest'
+                      id='round-rest-10'
+                      value={10}
+                      onChange={(e) => {
+                        setSecSingleRest(e.target.value);
+                      }}
+                      checked={secSingleRest === '10'}
+                      hidden
+                    />
+                    <label
+                      htmlFor='round-rest-10'
+                      className='radio block text-center font-semibold py-2 px-4 rounded-lg cursor-pointer'>
+                      10 s
+                    </label>
+                  </div>
+                  <div className=' rounded-lg bg-gray-500 hover:bg-opacity-75'>
+                    <input
+                      type='radio'
+                      name='round-rest'
+                      id='round-rest-20'
+                      value={20}
+                      onChange={(e) => {
+                        setSecSingleRest(e.target.value);
+                      }}
+                      checked={secSingleRest === '20'}
+                      hidden
+                    />
+                    <label
+                      htmlFor='round-rest-20'
+                      className='radio block text-center font-semibold py-2 px-4 rounded-lg cursor-pointer'>
+                      20 s
+                    </label>
+                  </div>
+                  <div className=' rounded-lg bg-gray-500 hover:bg-opacity-75'>
+                    <input
+                      type='radio'
+                      name='round-rest'
+                      id='round-rest-30'
+                      value={30}
+                      onChange={(e) => {
+                        setSecSingleRest(e.target.value);
+                      }}
+                      checked={secSingleRest === '30'}
+                      hidden
+                    />
+                    <label
+                      htmlFor='round-rest-30'
+                      className='radio block text-center font-semibold py-2 px-4 rounded-lg cursor-pointer'>
+                      30 s
+                    </label>
+                  </div>
+                  <div className=' rounded-lg bg-gray-500 hover:bg-opacity-75'>
+                    <input
+                      type='radio'
+                      name='round-rest'
+                      id='round-rest-45'
+                      value={45}
+                      onChange={(e) => {
+                        setSecSingleRest(e.target.value);
+                      }}
+                      checked={secSingleRest === '45'}
+                      hidden
+                    />
+                    <label
+                      htmlFor='round-rest-45'
+                      className='radio block text-center font-semibold py-2 px-4 rounded-lg cursor-pointer'>
+                      45 s
+                    </label>
+                  </div>
+                  <div className=' rounded-lg bg-gray-500 hover:bg-opacity-75'>
+                    <input
+                      type='radio'
+                      name='round-rest'
+                      id='round-rest-60'
+                      value={60}
+                      onChange={(e) => {
+                        setSecSingleRest(e.target.value);
+                      }}
+                      checked={secSingleRest === '60'}
+                      hidden
+                    />
+                    <label
+                      htmlFor='round-rest-60'
+                      className='radio block text-center font-semibold py-2 px-4 rounded-lg cursor-pointer'>
+                      1 m
+                    </label>
+                  </div>
+                </div>
               </fieldset>
               <button
                 type='submit'
