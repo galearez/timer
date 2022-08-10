@@ -247,32 +247,84 @@ export default function App() {
             </fieldset>
             {globalRests && (
               <fieldset className='flex items-end'>
-                <label className='flex flex-col flex-1 mr-1'>
-                  Minutes
-                  <select
-                    value={minGlobalRest}
-                    className='form-select flex-none'
-                    onChange={(e) => {
-                      setMinGlobalRest(e.target.value);
-                      setMinSingleRest(e.target.value);
-                    }}
-                    disabled={!globalRests}>
-                    {sixtyOptions}
-                  </select>
-                </label>
-                <label className='flex flex-col flex-1'>
-                  Seconds
-                  <select
-                    value={secGlobalRest}
-                    className='form-select flex-none'
+                <div>
+                  <input
+                    type='radio'
+                    name='rest'
+                    id='rest-5'
+                    value={5}
                     onChange={(e) => {
                       setSecGlobalRest(e.target.value);
                       setSecSingleRest(e.target.value);
                     }}
-                    disabled={!globalRests}>
-                    {twelveOptions}
-                  </select>
-                </label>
+                  />
+                  <label htmlFor='rest-5'>5 s</label>
+                </div>
+                <div>
+                  <input
+                    type='radio'
+                    name='rest'
+                    id='rest-10'
+                    value={10}
+                    onChange={(e) => {
+                      setSecGlobalRest(e.target.value);
+                      setSecSingleRest(e.target.value);
+                    }}
+                  />
+                  <label htmlFor='rest-10'>10 s</label>
+                </div>
+                <div>
+                  <input
+                    type='radio'
+                    name='rest'
+                    id='rest-20'
+                    value={20}
+                    onChange={(e) => {
+                      setSecGlobalRest(e.target.value);
+                      setSecSingleRest(e.target.value);
+                    }}
+                  />
+                  <label htmlFor='rest-20'>20 s</label>
+                </div>
+                <div>
+                  <input
+                    type='radio'
+                    name='rest'
+                    id='rest-30'
+                    value={30}
+                    onChange={(e) => {
+                      setSecGlobalRest(e.target.value);
+                      setSecSingleRest(e.target.value);
+                    }}
+                  />
+                  <label htmlFor='rest-30'>30 s</label>
+                </div>
+                <div>
+                  <input
+                    type='radio'
+                    name='rest'
+                    id='rest-45'
+                    value={45}
+                    onChange={(e) => {
+                      setSecGlobalRest(e.target.value);
+                      setSecSingleRest(e.target.value);
+                    }}
+                  />
+                  <label htmlFor='rest-45'>45 s</label>
+                </div>
+                <div>
+                  <input
+                    type='radio'
+                    name='rest'
+                    id='rest-60'
+                    value={60}
+                    onChange={(e) => {
+                      setSecGlobalRest(e.target.value);
+                      setSecSingleRest(e.target.value);
+                    }}
+                  />
+                  <label htmlFor='rest-60'>60 s</label>
+                </div>
               </fieldset>
             )}
           </form>
