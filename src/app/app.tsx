@@ -50,8 +50,6 @@ export default function App() {
 
   // user input box references
   let labelRef: React.RefObject<HTMLInputElement> = useRef(null);
-  let activityMinRef: React.RefObject<HTMLSelectElement> = useRef(null);
-  let activitySecRef: React.RefObject<HTMLSelectElement> = useRef(null);
 
   useEffect(() => {
     window.addEventListener('resize', () => setScreenWidth(window.innerWidth));
@@ -76,30 +74,19 @@ export default function App() {
     }
   }, [screenWidth]);
 
-  // just because I don't want to have a big parameter list on 'handleUserInput' I created this
-  // type which is meant to be used with rest parameters
-  type SelectRefsArray = [
-    React.RefObject<HTMLSelectElement>,
-    React.RefObject<HTMLSelectElement>
-  ];
-
   // this function get the values from the user and assign them to the routine state
   function handleUserInput(
     event: React.FormEvent<HTMLFormElement>,
     roundId: number,
-    label?: React.RefObject<HTMLInputElement>,
-    ...selects: SelectRefsArray
+    label?: React.RefObject<HTMLInputElement>
   ) {
     event.preventDefault();
 
     // parse times from strings to integers, since I used a select with only numbers as options
     // there will not be problem on parsing
-    const activityMin = parseInt(selects[0].current?.value ?? '0');
-    const activitySec = parseInt(selects[1].current?.value ?? '0');
+    const activityTime = parseInt(activitySec ?? '0');
     const restTime = parseInt(secSingleRest ?? '0');
 
-    // convert minutes and seconds to a single time value in seconds
-    const activityTime = activityMin * 60 + activitySec;
     if (activityTime === 0) {
       return;
     }
@@ -124,7 +111,6 @@ export default function App() {
     // reset the values of the single rests, if there are global rests, they will be reset to that value, if not
     // they will be reset to 0
     setSecSingleRest(secGlobalRest);
-    setActivityMin('0');
     setActivitySec('0');
     if (!globalRests) {
       setSingleRest(false);
@@ -374,13 +360,7 @@ export default function App() {
             <form
               className='bg-gray-800 w-11/12 md:w-full p-2 md:p-0 rounded-md absolute md:relative top-1/2 left-1/2 md:top-auto md:left-auto transform -translate-y-1/2 -translate-x-1/2 md:transform-none'
               onSubmit={(event) =>
-                handleUserInput(
-                  event,
-                  activityDefaultName,
-                  labelRef,
-                  activityMinRef,
-                  activitySecRef
-                )
+                handleUserInput(event, activityDefaultName, labelRef)
               }>
               <h2>Round</h2>
               <fieldset>
