@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../hooks';
-import { removeRound } from './routine-slice';
 import { mount } from './mount-countdown-slice';
 import { restart } from '../countdown/current-slice';
 import Countdown from '../countdown';
 import GlobalRestForm from './global-rest-form';
 import AddNewRound from './round-form';
+import ActivitiesList from './activities-list';
 import clsx from 'clsx';
 
 import Icons from '../utils/icons';
@@ -66,11 +66,6 @@ export default function App() {
     setSingleRest(!globalRests);
   }
 
-  // this method will delete a round
-  function handleDeleteRound(id: string) {
-    dispatch(removeRound(id));
-  }
-
   useEffect(() => {
     setSecSingleRest(secGlobalRest);
   }, [setSecGlobalRest, secGlobalRest]);
@@ -98,33 +93,6 @@ export default function App() {
       setActivityForm(false);
     }
   }, [setActivityForm, screenWidth]);
-
-  // this variable is meant to render the routine
-  const activitiesList = routine.map((elem: any) => {
-    const minutes = Math.floor(elem.time / 60);
-    const seconds = elem.time % 60;
-
-    return (
-      <div
-        key={elem.id}
-        className='w-full bg-gray-700 rounded-md p-2 mb-2 flex justify-between items-center flex-nowrap text-lg'>
-        <span>{elem.label}</span>
-        <div className='flex items-center'>
-          <span>
-            {minutes < 10 ? <span>0{minutes}</span> : <span>{minutes}</span>}:
-            {seconds < 10 ? <span>0{seconds}</span> : <span>{seconds}</span>}
-          </span>
-          <span
-            className='inline-block ml-3'
-            onClick={() => {
-              handleDeleteRound(elem.id);
-            }}>
-            <Icons value={'delete'} />
-          </span>
-        </div>
-      </div>
-    );
-  });
 
   return (
     <div className='w-full max-w-xl m-auto md:grid grid-cols-1'>
@@ -197,7 +165,9 @@ export default function App() {
           <NextActivity currentActivity={currentActivity} routine={routine} />
         )}
       </div>
-      <div className='mt-2'>{activitiesList}</div>
+      <div className='mt-2'>
+        <ActivitiesList activities={routine} />
+      </div>
     </div>
   );
 }
