@@ -8,18 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import clsx from 'clsx';
 
 import Icons from '../utils/icons';
-
-//before this change this two arrays where auto-generated on component mounting, but there was a big problem
-//it needs to 'update' before generating the options for the select box so when using it on desktop there
-//are not options at the start, thats why even if it's annoying I created this two arrays so there
-//are options on first rendering
-const FIVE_BY_FIVE = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60];
-const ONE_BY_ONE = [
-  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-  22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
-  41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
-  60,
-];
+import GlobalRestForm from './global-rest-form';
 
 // this component will handle the user input and will pass main data, rounds (id, label and time)
 // to the other components
@@ -140,20 +129,6 @@ export default function App() {
   function handleDeleteRound(id: string) {
     dispatch(removeRound(id));
   }
-
-  // creates options for the minutes select box
-  const sixtyOptions = ONE_BY_ONE.map((elem: number) => (
-    <option value={elem} key={elem}>
-      {elem}
-    </option>
-  ));
-
-  // create options for the seconds select box
-  const twelveOptions = FIVE_BY_FIVE.map((elem: number) => (
-    <option value={elem} key={elem}>
-      {elem}
-    </option>
-  ));
 
   // this variable is meant to render the routine
   const activitiesList = routine.map((elem: any) => {
