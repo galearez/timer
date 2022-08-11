@@ -1,11 +1,11 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../hooks';
-import { addRound, removeRound } from './routine-slice';
+import { removeRound } from './routine-slice';
 import { mount } from './mount-countdown-slice';
 import { restart } from '../countdown/current-slice';
 import Countdown from '../countdown';
 import GlobalRestForm from './global-rest-form';
-import { v4 as uuidv4 } from 'uuid';
+import AddNewRound from './round-form';
 import clsx from 'clsx';
 
 import Icons from '../utils/icons';
@@ -20,8 +20,6 @@ export default function App() {
   let routine = useAppSelector((state) => state.routine.value);
   let currentActivity = useAppSelector((state) => state.current.value);
   let mountCountdown = useAppSelector((state) => state.mountCountdown.value);
-  // these states control the current round time
-  let [activitySec, setActivitySec] = useState('0');
   // these states control when the user selects to add a rest after each avtivity
   let [globalRests, setGlobalRests] = useState(false);
   let [secGlobalRest, setSecGlobalRest] = useState('0');
@@ -32,11 +30,6 @@ export default function App() {
   let [activityForm, setActivityForm] = useState(false);
   // this state is meant to unmount the home UI and mount/unmount the countdown component
   let [closeHomeScreen, setCloseHomeScreen] = useState(false);
-  // this state is meant to be use on naming when the user don't specify an activity name
-  let [activityDefaultName, setActivityDefaultName] = useState(1);
-
-  // user input box references
-  let labelRef: React.RefObject<HTMLInputElement> = useRef(null);
 
   useEffect(() => {
     window.addEventListener('resize', () => setScreenWidth(window.innerWidth));
@@ -60,56 +53,6 @@ export default function App() {
       return setActivityForm(false);
     }
   }, [screenWidth]);
-
-  // this function get the values from the user and assign them to the routine state
-  function handleUserInput(
-    event: React.FormEvent<HTMLFormElement>,
-    roundId: number,
-    label?: React.RefObject<HTMLInputElement>
-  ) {
-    event.preventDefault();
-
-    // parse times from strings to integers, since I used a select with only numbers as options
-    // there will not be problem on parsing
-    const activityTime = parseInt(activitySec ?? '0');
-    const restTime = parseInt(secSingleRest ?? '0');
-
-    if (activityTime === 0) {
-      return;
-    }
-
-    // after everyting has been parsed and the time is > 0, add activity to the routine
-    const activitylabel = label?.current?.value
-      ? label?.current?.value
-      : `Activity ${roundId}`;
-    dispatch(
-      addRound({ id: uuidv4(), label: activitylabel, time: activityTime })
-    );
-
-    // once a round is created it adds one to the counter
-    setActivityDefaultName((prev) => prev + 1);
-
-    // add a rest after the round if the user has one of the add Rest switches enabled, it is like this
-    // because that way the user can turn off the global rest if they don't need it between rounds
-    if (singleRest && restTime !== 0) {
-      dispatch(addRound({ id: uuidv4(), label: 'Rest', time: restTime }));
-    }
-
-    // reset the values of the single rests, if there are global rests, they will be reset to that value, if not
-    // they will be reset to 0
-    setSecSingleRest(secGlobalRest);
-    setActivitySec('0');
-    if (!globalRests) {
-      setSingleRest(false);
-    } else {
-      setSingleRest(true);
-    }
-
-    // close the input form modal
-    if (screenWidth < 768) {
-      setActivityForm(false);
-    }
-  }
 
   // this function will handle all the fields where the input can add data, they will only be rendered
   // once the user need them in mobile, in screens > 768, they will be rendered by default and the only
@@ -148,6 +91,13 @@ export default function App() {
     },
     [setSecGlobalRest]
   );
+
+  //
+  const closeActivityFormCallback = useCallback(() => {
+    if (screenWidth < 768) {
+      setActivityForm(false);
+    }
+  }, [setActivityForm, screenWidth]);
 
   // this variable is meant to render the routine
   const activitiesList = routine.map((elem: any) => {
@@ -226,255 +176,11 @@ export default function App() {
           </div>
         )}
         {!closeHomeScreen && activityForm && (
-          <div className='absolute md:relative top-0 left-0 w-full h-full'>
-            <div
-              className='absolute md:hidden top-0 left-0 w-full h-full bg-gray-50 bg-opacity-30'
-              onClick={() => handleToggleFieldset('activityForm')}></div>
-            <form
-              className='bg-gray-800 w-11/12 md:w-full p-2 md:p-0 rounded-md absolute md:relative top-1/2 left-1/2 md:top-auto md:left-auto transform -translate-y-1/2 -translate-x-1/2 md:transform-none'
-              onSubmit={(event) =>
-                handleUserInput(event, activityDefaultName, labelRef)
-              }>
-              <h2>Round</h2>
-              <fieldset>
-                <label className='flex flex-col'>
-                  Name
-                  <input
-                    type='text'
-                    className='form-input mt-1'
-                    ref={labelRef}
-                    placeholder={`Activity ${activityDefaultName}`}
-                  />
-                </label>
-              </fieldset>
-              <fieldset className='grid grid-cols-3 sm:grid-cols-6 gap-3 my-3'>
-                <div className='rounded-lg bg-gray-700 hover:bg-opacity-75'>
-                  <input
-                    type='radio'
-                    name='activity'
-                    id='acivity-ten'
-                    value={10}
-                    hidden
-                    onChange={() => setActivitySec('10')}
-                    checked={activitySec === '10'}
-                  />
-                  <label
-                    htmlFor='acivity-ten'
-                    className='radio block font-semibold text-center py-2 px-4 rounded-lg cursor-pointer'>
-                    10 s
-                  </label>
-                </div>
-                <div className=' rounded-lg bg-gray-700 hover:bg-opacity-75'>
-                  <input
-                    type='radio'
-                    name='activity'
-                    id='activity-twenty'
-                    value={20}
-                    hidden
-                    onChange={() => setActivitySec('20')}
-                    checked={activitySec === '20'}
-                  />
-                  <label
-                    htmlFor='activity-twenty'
-                    className='radio block font-semibold text-center py-2 px-4 rounded-lg cursor-pointer'>
-                    20 s
-                  </label>
-                </div>
-                <div className=' rounded-lg bg-gray-700 hover:bg-opacity-75'>
-                  <input
-                    type='radio'
-                    name='activity'
-                    id='activity-thirty'
-                    value={30}
-                    hidden
-                    onChange={() => setActivitySec('30')}
-                    checked={activitySec === '30'}
-                  />
-                  <label
-                    htmlFor='activity-thirty'
-                    className='radio block font-semibold text-center py-2 px-4 rounded-lg cursor-pointer'>
-                    30 s
-                  </label>
-                </div>
-                <div className=' rounded-lg bg-gray-700 hover:bg-opacity-75'>
-                  <input
-                    type='radio'
-                    name='activity'
-                    id='activity-forty5'
-                    value={45}
-                    hidden
-                    onChange={() => setActivitySec('45')}
-                    checked={activitySec === '45'}
-                  />
-                  <label
-                    htmlFor='activity-forty5'
-                    className='radio block font-semibold text-center py-2 px-4 rounded-lg cursor-pointer'>
-                    45 s
-                  </label>
-                </div>
-                <div className=' rounded-lg bg-gray-700 hover:bg-opacity-75'>
-                  <input
-                    type='radio'
-                    name='activity'
-                    id='activity-sixty'
-                    value={60}
-                    hidden
-                    onChange={() => setActivitySec('60')}
-                    checked={activitySec === '60'}
-                  />
-                  <label
-                    htmlFor='activity-sixty'
-                    className='radio block font-semibold text-center py-2 px-4 rounded-lg cursor-pointer'>
-                    1 m
-                  </label>
-                </div>
-                <div className=' rounded-lg bg-gray-700 hover:bg-opacity-75'>
-                  <input
-                    type='radio'
-                    name='activity'
-                    id='activity-180'
-                    value={180}
-                    hidden
-                    onChange={() => setActivitySec('180')}
-                    checked={activitySec === '180'}
-                  />
-                  <label
-                    htmlFor='activity-180'
-                    className='radio block font-semibold text-center py-2 px-4 rounded-lg cursor-pointer'>
-                    3 m
-                  </label>
-                </div>
-              </fieldset>
-              <fieldset className='bg-gray-700 mb-2 px-2 pb-2 rounded-md'>
-                <span className='mt-1 flex justify-between items-center'>
-                  <h2>Rest</h2>
-                  <label className='toggle-switch '>
-                    <input
-                      type='checkbox'
-                      onChange={() => handleToggleFieldset('singleRest')}
-                      checked={singleRest}
-                    />
-                    <span className='slider'></span>
-                  </label>
-                </span>
-                <div className='grid grid-cols-3 sm:grid-cols-6 gap-3 mt-1 sm:mt-2'>
-                  <div className=' rounded-lg bg-gray-500 hover:bg-opacity-75'>
-                    <input
-                      type='radio'
-                      name='round-rest'
-                      id='round-rest-5'
-                      value={5}
-                      onChange={(e) => {
-                        setSecSingleRest(e.target.value);
-                      }}
-                      checked={secSingleRest === '5'}
-                      hidden
-                    />
-                    <label
-                      htmlFor='round-rest-5'
-                      className='radio block text-center font-semibold py-2 px-4 rounded-lg cursor-pointer'>
-                      5 s
-                    </label>
-                  </div>
-                  <div className=' rounded-lg bg-gray-500 hover:bg-opacity-75'>
-                    <input
-                      type='radio'
-                      name='round-rest'
-                      id='round-rest-10'
-                      value={10}
-                      onChange={(e) => {
-                        setSecSingleRest(e.target.value);
-                      }}
-                      checked={secSingleRest === '10'}
-                      hidden
-                    />
-                    <label
-                      htmlFor='round-rest-10'
-                      className='radio block text-center font-semibold py-2 px-4 rounded-lg cursor-pointer'>
-                      10 s
-                    </label>
-                  </div>
-                  <div className=' rounded-lg bg-gray-500 hover:bg-opacity-75'>
-                    <input
-                      type='radio'
-                      name='round-rest'
-                      id='round-rest-20'
-                      value={20}
-                      onChange={(e) => {
-                        setSecSingleRest(e.target.value);
-                      }}
-                      checked={secSingleRest === '20'}
-                      hidden
-                    />
-                    <label
-                      htmlFor='round-rest-20'
-                      className='radio block text-center font-semibold py-2 px-4 rounded-lg cursor-pointer'>
-                      20 s
-                    </label>
-                  </div>
-                  <div className=' rounded-lg bg-gray-500 hover:bg-opacity-75'>
-                    <input
-                      type='radio'
-                      name='round-rest'
-                      id='round-rest-30'
-                      value={30}
-                      onChange={(e) => {
-                        setSecSingleRest(e.target.value);
-                      }}
-                      checked={secSingleRest === '30'}
-                      hidden
-                    />
-                    <label
-                      htmlFor='round-rest-30'
-                      className='radio block text-center font-semibold py-2 px-4 rounded-lg cursor-pointer'>
-                      30 s
-                    </label>
-                  </div>
-                  <div className=' rounded-lg bg-gray-500 hover:bg-opacity-75'>
-                    <input
-                      type='radio'
-                      name='round-rest'
-                      id='round-rest-45'
-                      value={45}
-                      onChange={(e) => {
-                        setSecSingleRest(e.target.value);
-                      }}
-                      checked={secSingleRest === '45'}
-                      hidden
-                    />
-                    <label
-                      htmlFor='round-rest-45'
-                      className='radio block text-center font-semibold py-2 px-4 rounded-lg cursor-pointer'>
-                      45 s
-                    </label>
-                  </div>
-                  <div className=' rounded-lg bg-gray-500 hover:bg-opacity-75'>
-                    <input
-                      type='radio'
-                      name='round-rest'
-                      id='round-rest-60'
-                      value={60}
-                      onChange={(e) => {
-                        setSecSingleRest(e.target.value);
-                      }}
-                      checked={secSingleRest === '60'}
-                      hidden
-                    />
-                    <label
-                      htmlFor='round-rest-60'
-                      className='radio block text-center font-semibold py-2 px-4 rounded-lg cursor-pointer'>
-                      1 m
-                    </label>
-                  </div>
-                </div>
-              </fieldset>
-              <button
-                type='submit'
-                className='font-bold text-white block w-3/5 py-2 px-4 m-auto rounded-md bg-gradient-to-r from-mint to-lime'>
-                Add round
-              </button>
-            </form>
-          </div>
+          <AddNewRound
+            globalRest={globalRests}
+            globalRestTime={secSingleRest}
+            closeActivityForm={closeActivityFormCallback}
+          />
         )}
         {closeHomeScreen && (
           <div>
