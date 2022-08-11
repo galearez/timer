@@ -1,6 +1,4 @@
-import { useState } from 'react';
-
-// cuando se oculte el formularion para añadir descansos, debo poner al valor de los descansos devuelta en 0
+import { useEffect, useState } from 'react';
 
 interface GlobalRestFormProps {
   setRestTime: (s: string) => void;
@@ -10,25 +8,15 @@ interface GlobalRestFormProps {
 // 00000000000000000000000000000000000000000000000000000000000
 export default function GlobalRestForm(props: GlobalRestFormProps) {
   let [globalRests, setGlobalRests] = useState(false);
-  // let [globalRestTime, setGlobalRestTime] = useState('0');
 
   function toggleRadioFieldset() {
     setGlobalRests(!globalRests);
     props.showSingleRest(!globalRests);
   }
 
-  // function handleToggleFieldset(
-  //   field: 'globalRests' | 'activityForm' | 'singleRest'
-  // ) {
-  //   if (field === 'activityForm') return setActivityForm(!activityForm);
-  //   if (field === 'singleRest') return setSingleRest(!singleRest);
-  //   setGlobalRests(!globalRests);
-  //   setSingleRest(!globalRests);
-  // }
-
-  // un callback para abrir o cerrar singleRest dependiendo del estado de globalRest
-
-  // un callback para darle un valor por defecto a singleRest dependiendo del estado de globalRest
+  useEffect(() => {
+    if (!globalRests) props.setRestTime('0');
+  }, [globalRests]);
 
   return (
     <form className='w-full md:mt-2 flex flex-col'>
