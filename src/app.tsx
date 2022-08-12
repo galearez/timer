@@ -3,7 +3,7 @@ import { useAppSelector } from './hooks';
 import Countdown from './countdown';
 import GlobalRestForm from './app/global-rest-form';
 import AddNewRound from './app/round-form';
-import ActivitiesList from './app/activities-list';
+import ActivitiesList from './activities-list';
 import clsx from 'clsx';
 
 import NextActivity from './app/next-activity';
