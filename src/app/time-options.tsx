@@ -1,6 +1,3 @@
-const REST = [5, 10, 15, 20, 30, 45, 60];
-const ACTIVITY = [10, 20, 30, 45, 60, 180];
-
 interface TimeOptionsProps {
   group: string;
   time: string;

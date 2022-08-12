@@ -15,7 +15,7 @@ export default function GlobalRestForm() {
   // if we hide the form is precise to set the time to 0 to not polute the add round form
   useEffect(() => {
     if (!rest.active) rest.setTime('0');
-  }, [rest.active]);
+  }, [rest]);
 
   // since the markup for the radio buttons was too repetitive I made it into its own component
   // this way I can iteratively create the buttons

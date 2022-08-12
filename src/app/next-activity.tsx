@@ -1,4 +1,3 @@
-// this variable is meant to show the next round on the routine
 interface Activities {
   id: string;
   label: string;
