@@ -1,8 +1,9 @@
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { useAppDispatch } from '../hooks';
 import { addRound } from './routine-slice';
 import { v4 as uuidv4 } from 'uuid';
 import { GlobalRestContext } from './app';
+import TimeOptions from './time-options';
 
 interface AddNewRoundProps {
   closeActivityForm: () => void;
@@ -52,7 +53,7 @@ export default function AddNewRound(props: AddNewRoundProps) {
     );
 
     // once a round is created, change the next activity name
-    setActivityDefaultName(1);
+    setActivityDefaultName((prev) => prev + 1);
 
     // add a rest after the round if the user has the singleRest switch enabled, this
     // way the user can turn off the singleRest if they don't need reste after the new activity
@@ -77,6 +78,25 @@ export default function AddNewRound(props: AddNewRoundProps) {
     setRestTime(globalRest.time);
   }, [globalRest]);
 
+  // this callback will set the acticity time from its corresponding radio button
+  const setTimeCallback = useCallback(
+    (time: string) => {
+      setRoundTime(time);
+    },
+    [setRoundTime]
+  );
+
+  // here we will generate the list of time options for an activity
+  const ACTIVITY = ['10', '20', '30', '45', '60', '180'];
+  const activityOptions = ACTIVITY.map((time) => (
+    <TimeOptions
+      key={`activity-${time}`}
+      group='activity-time'
+      time={time}
+      setTime={setTimeCallback}
+    />
+  ));
+
   return (
     <div className='absolute md:relative top-0 left-0 w-full h-full'>
       <div
@@ -100,102 +120,7 @@ export default function AddNewRound(props: AddNewRoundProps) {
           </label>
         </fieldset>
         <fieldset className='grid grid-cols-3 sm:grid-cols-6 gap-3 my-3'>
-          <div className='rounded-lg bg-gray-700 hover:bg-opacity-75'>
-            <input
-              type='radio'
-              name='activity'
-              id='acivity-ten'
-              value={10}
-              hidden
-              onChange={() => setRoundTime('10')}
-              checked={roundTime === '10'}
-            />
-            <label
-              htmlFor='acivity-ten'
-              className='radio block font-semibold text-center py-2 px-4 rounded-lg cursor-pointer'>
-              10 s
-            </label>
-          </div>
-          <div className=' rounded-lg bg-gray-700 hover:bg-opacity-75'>
-            <input
-              type='radio'
-              name='activity'
-              id='activity-twenty'
-              value={20}
-              hidden
-              onChange={() => setRoundTime('20')}
-              checked={roundTime === '20'}
-            />
-            <label
-              htmlFor='activity-twenty'
-              className='radio block font-semibold text-center py-2 px-4 rounded-lg cursor-pointer'>
-              20 s
-            </label>
-          </div>
-          <div className=' rounded-lg bg-gray-700 hover:bg-opacity-75'>
-            <input
-              type='radio'
-              name='activity'
-              id='activity-thirty'
-              value={30}
-              hidden
-              onChange={() => setRoundTime('30')}
-              checked={roundTime === '30'}
-            />
-            <label
-              htmlFor='activity-thirty'
-              className='radio block font-semibold text-center py-2 px-4 rounded-lg cursor-pointer'>
-              30 s
-            </label>
-          </div>
-          <div className=' rounded-lg bg-gray-700 hover:bg-opacity-75'>
-            <input
-              type='radio'
-              name='activity'
-              id='activity-forty5'
-              value={45}
-              hidden
-              onChange={() => setRoundTime('45')}
-              checked={roundTime === '45'}
-            />
-            <label
-              htmlFor='activity-forty5'
-              className='radio block font-semibold text-center py-2 px-4 rounded-lg cursor-pointer'>
-              45 s
-            </label>
-          </div>
-          <div className=' rounded-lg bg-gray-700 hover:bg-opacity-75'>
-            <input
-              type='radio'
-              name='activity'
-              id='activity-sixty'
-              value={60}
-              hidden
-              onChange={() => setRoundTime('60')}
-              checked={roundTime === '60'}
-            />
-            <label
-              htmlFor='activity-sixty'
-              className='radio block font-semibold text-center py-2 px-4 rounded-lg cursor-pointer'>
-              1 m
-            </label>
-          </div>
-          <div className=' rounded-lg bg-gray-700 hover:bg-opacity-75'>
-            <input
-              type='radio'
-              name='activity'
-              id='activity-180'
-              value={180}
-              hidden
-              onChange={() => setRoundTime('180')}
-              checked={roundTime === '180'}
-            />
-            <label
-              htmlFor='activity-180'
-              className='radio block font-semibold text-center py-2 px-4 rounded-lg cursor-pointer'>
-              3 m
-            </label>
-          </div>
+          {activityOptions}
         </fieldset>
         <fieldset className='bg-gray-700 mb-2 px-2 pb-2 rounded-md'>
           <span className='mt-1 flex justify-between items-center'>
