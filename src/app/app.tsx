@@ -7,7 +7,7 @@ import ActivitiesList from './activities-list';
 import clsx from 'clsx';
 
 import NextActivity from './next-activity';
-import NavBar from './navbar';
+import NavBar from '../navbar';
 
 type DefaultTimeOptions = '0' | '5' | '10' | '20' | '30' | '45' | '60' | '180';
 
