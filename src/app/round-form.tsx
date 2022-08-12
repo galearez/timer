@@ -1,13 +1,22 @@
-import { useCallback, useContext, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { useAppDispatch } from '../hooks';
 import { addRound } from './routine-slice';
 import { v4 as uuidv4 } from 'uuid';
 import { GlobalRestContext } from './app';
 import TimeOptions from './time-options';
+import { TimeContext } from './time.context';
 
 interface AddNewRoundProps {
   closeActivityForm: () => void;
 }
+
+// crear un reducer para activity default name, porque no está guardando el valor en moviles
 
 export default function AddNewRound(props: AddNewRoundProps) {
   const dispatch = useAppDispatch();
@@ -89,11 +98,22 @@ export default function AddNewRound(props: AddNewRoundProps) {
   // here we will generate the list of time options for an activity
   const ACTIVITY = ['10', '20', '30', '45', '60', '180'];
   const activityOptions = ACTIVITY.map((time) => (
+    <TimeOptions key={`activity-${time}`} group='activity-time' time={time} />
+  ));
+
+  ///
+  const setRestTimeCallback = useCallback(
+    (time: string) => {
+      setRestTime(time);
+    },
+    [setRestTime]
+  );
+  const REST = ['5', '10', '20', '30', '45', '60'];
+  const restOptions = REST.map((time) => (
     <TimeOptions
-      key={`activity-${time}`}
-      group='activity-time'
+      key={`round-rest-${time}`}
+      group='round-rest-time'
       time={time}
-      setTime={setTimeCallback}
     />
   ));
 
@@ -120,7 +140,14 @@ export default function AddNewRound(props: AddNewRoundProps) {
           </label>
         </fieldset>
         <fieldset className='grid grid-cols-3 sm:grid-cols-6 gap-3 my-3'>
-          {activityOptions}
+          <TimeContext.Provider
+            value={{
+              value: roundTime,
+              setValue: setRoundTime,
+              dependent: false,
+            }}>
+            {activityOptions}
+          </TimeContext.Provider>
         </fieldset>
         <fieldset className='bg-gray-700 mb-2 px-2 pb-2 rounded-md'>
           <span className='mt-1 flex justify-between items-center'>
@@ -135,114 +162,14 @@ export default function AddNewRound(props: AddNewRoundProps) {
             </label>
           </span>
           <div className='grid grid-cols-3 sm:grid-cols-6 gap-3 mt-1 sm:mt-2'>
-            <div className=' rounded-lg bg-gray-500 hover:bg-opacity-75'>
-              <input
-                type='radio'
-                name='round-rest'
-                id='round-rest-5'
-                value={5}
-                onChange={(e) => {
-                  setRestTime(e.target.value);
-                }}
-                checked={restTime === '5'}
-                hidden
-              />
-              <label
-                htmlFor='round-rest-5'
-                className='radio block text-center font-semibold py-2 px-4 rounded-lg cursor-pointer'>
-                5 s
-              </label>
-            </div>
-            <div className=' rounded-lg bg-gray-500 hover:bg-opacity-75'>
-              <input
-                type='radio'
-                name='round-rest'
-                id='round-rest-10'
-                value={10}
-                onChange={(e) => {
-                  setRestTime(e.target.value);
-                }}
-                checked={restTime === '10'}
-                hidden
-              />
-              <label
-                htmlFor='round-rest-10'
-                className='radio block text-center font-semibold py-2 px-4 rounded-lg cursor-pointer'>
-                10 s
-              </label>
-            </div>
-            <div className=' rounded-lg bg-gray-500 hover:bg-opacity-75'>
-              <input
-                type='radio'
-                name='round-rest'
-                id='round-rest-20'
-                value={20}
-                onChange={(e) => {
-                  setRestTime(e.target.value);
-                }}
-                checked={restTime === '20'}
-                hidden
-              />
-              <label
-                htmlFor='round-rest-20'
-                className='radio block text-center font-semibold py-2 px-4 rounded-lg cursor-pointer'>
-                20 s
-              </label>
-            </div>
-            <div className=' rounded-lg bg-gray-500 hover:bg-opacity-75'>
-              <input
-                type='radio'
-                name='round-rest'
-                id='round-rest-30'
-                value={30}
-                onChange={(e) => {
-                  setRestTime(e.target.value);
-                }}
-                checked={restTime === '30'}
-                hidden
-              />
-              <label
-                htmlFor='round-rest-30'
-                className='radio block text-center font-semibold py-2 px-4 rounded-lg cursor-pointer'>
-                30 s
-              </label>
-            </div>
-            <div className=' rounded-lg bg-gray-500 hover:bg-opacity-75'>
-              <input
-                type='radio'
-                name='round-rest'
-                id='round-rest-45'
-                value={45}
-                onChange={(e) => {
-                  setRestTime(e.target.value);
-                }}
-                checked={restTime === '45'}
-                hidden
-              />
-              <label
-                htmlFor='round-rest-45'
-                className='radio block text-center font-semibold py-2 px-4 rounded-lg cursor-pointer'>
-                45 s
-              </label>
-            </div>
-            <div className=' rounded-lg bg-gray-500 hover:bg-opacity-75'>
-              <input
-                type='radio'
-                name='round-rest'
-                id='round-rest-60'
-                value={60}
-                onChange={(e) => {
-                  setRestTime(e.target.value);
-                }}
-                checked={restTime === '60'}
-                hidden
-              />
-              <label
-                htmlFor='round-rest-60'
-                className='radio block text-center font-semibold py-2 px-4 rounded-lg cursor-pointer'>
-                1 m
-              </label>
-            </div>
+            <TimeContext.Provider
+              value={{
+                value: restTime,
+                setValue: setRestTime,
+                dependent: true,
+              }}>
+              {restOptions}
+            </TimeContext.Provider>
           </div>
         </fieldset>
         <button

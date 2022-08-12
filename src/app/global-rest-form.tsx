@@ -1,6 +1,7 @@
 import { useContext, useEffect } from 'react';
 import { RestContext } from './app';
 import TimeOptions from './time-options';
+import { TimeContext } from './time.context';
 
 export default function GlobalRestForm() {
   // this context will hold the state of the global rest form and the rest time
@@ -21,12 +22,7 @@ export default function GlobalRestForm() {
   // this way I can iteratively create the buttons
   const REST = ['5', '10', '20', '30', '45', '60'];
   const timeOptions = REST.map((option) => (
-    <TimeOptions
-      key={`rest-${option}`}
-      group='rest'
-      time={option}
-      setTime={rest.setTime}
-    />
+    <TimeOptions key={`rest-${option}`} group='rest' time={option} />
   ));
 
   return (
@@ -44,7 +40,14 @@ export default function GlobalRestForm() {
       </fieldset>
       {rest.active && (
         <fieldset className='grid grid-cols-3 sm:grid-cols-6 gap-3 mt-1 sm:my-2'>
-          {timeOptions}
+          <TimeContext.Provider
+            value={{
+              value: rest.time,
+              setValue: rest.setTime,
+              dependent: false,
+            }}>
+            {timeOptions}
+          </TimeContext.Provider>
         </fieldset>
       )}
     </form>
