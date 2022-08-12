@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useAppDispatch } from '../hooks';
 import { addRound } from './routine-slice';
 import { v4 as uuidv4 } from 'uuid';
@@ -87,27 +81,13 @@ export default function AddNewRound(props: AddNewRoundProps) {
     setRestTime(globalRest.time);
   }, [globalRest]);
 
-  // this callback will set the acticity time from its corresponding radio button
-  const setTimeCallback = useCallback(
-    (time: string) => {
-      setRoundTime(time);
-    },
-    [setRoundTime]
-  );
-
-  // here we will generate the list of time options for an activity
+  // here we will generate the list with the time options for an activity
   const ACTIVITY = ['10', '20', '30', '45', '60', '180'];
   const activityOptions = ACTIVITY.map((time) => (
     <TimeOptions key={`activity-${time}`} group='activity-time' time={time} />
   ));
 
-  ///
-  const setRestTimeCallback = useCallback(
-    (time: string) => {
-      setRestTime(time);
-    },
-    [setRestTime]
-  );
+  // here we will generate the list with the time options for an activity rest
   const REST = ['5', '10', '20', '30', '45', '60'];
   const restOptions = REST.map((time) => (
     <TimeOptions
