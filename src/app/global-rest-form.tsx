@@ -3,6 +3,8 @@ import { RestContext } from './app';
 import TimeOptions from './time-options';
 import { TimeContext } from './time.context';
 
+type DefaultTimeOptions = '0' | '5' | '10' | '20' | '30' | '45' | '60' | '180';
+
 export default function GlobalRestForm() {
   // this context will hold the state of the global rest form and the rest time
   // also it will provide two callback to control the state from this component
@@ -20,7 +22,7 @@ export default function GlobalRestForm() {
 
   // since the markup for the radio buttons was too repetitive I made it into its own component
   // this way I can iteratively create the buttons
-  const REST = ['5', '10', '20', '30', '45', '60'];
+  const REST: DefaultTimeOptions[] = ['5', '10', '20', '30', '45', '60'];
   const timeOptions = REST.map((option) => (
     <TimeOptions key={`rest-${option}`} group='rest' time={option} />
   ));
@@ -28,7 +30,7 @@ export default function GlobalRestForm() {
   return (
     <form className='w-full md:mt-2 flex flex-col'>
       <fieldset className='text-lg mt-2 flex justify-between items-center'>
-        <h2 onClick={() => rest.setTime(`${Date.now()}`)}>Repeat rest</h2>
+        <h2>Repeat rest</h2>
         <label className='toggle-switch'>
           <input
             type='checkbox'

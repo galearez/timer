@@ -9,16 +9,28 @@ import clsx from 'clsx';
 import NextActivity from './next-activity';
 import NavBar from './navbar';
 
+type DefaultTimeOptions = '0' | '5' | '10' | '20' | '30' | '45' | '60' | '180';
+
+interface RestContextTypes {
+  active: boolean;
+  time: DefaultTimeOptions;
+  setActive: (v: boolean) => void;
+  setTime: (t: DefaultTimeOptions) => void;
+}
+
 // this context will pass the control of the rest states to the global rest component
-export const RestContext = React.createContext({
+export const RestContext = React.createContext<RestContextTypes>({
   active: false,
   time: '0',
   setActive: (value: boolean) => {},
-  setTime: (time: string) => {},
+  setTime: (time: DefaultTimeOptions) => {},
 });
 
 // this context will pass read-only values to the add round form to set the default state of the rest time
-export const GlobalRestContext = React.createContext({
+export const GlobalRestContext = React.createContext<{
+  active: boolean;
+  time: DefaultTimeOptions;
+}>({
   active: false,
   time: '0',
 });
@@ -46,7 +58,7 @@ export default function App() {
   let mountCountdown = useAppSelector((state) => state.mountCountdown.value);
   // these states control when the user selects to add a rest after each avtivity
   let [restActive, setRestActive] = useState(false);
-  let [restTime, setRestTime] = useState('0');
+  let [restTime, setRestTime] = useState<DefaultTimeOptions>('0');
   // this state is a boolean becuase is used to show the main input form based on the viewport size
   let [addRoundFormActive, setAddRoundFormActive] = useState(false);
   // this state is meant to unmount the home UI and mount/unmount the countdown component

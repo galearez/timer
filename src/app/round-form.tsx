@@ -6,6 +6,7 @@ import { GlobalRestContext } from './app';
 import TimeOptions from './time-options';
 import { TimeContext } from './time.context';
 
+type DefaultTimeOptions = '0' | '5' | '10' | '20' | '30' | '45' | '60' | '180';
 interface AddNewRoundProps {
   closeActivityForm: () => void;
 }
@@ -20,11 +21,11 @@ export default function AddNewRound(props: AddNewRoundProps) {
   // this state is meant to be use on naming when the user don't specify an activity name
   let [activityDefaultName, setActivityDefaultName] = useState(1);
   // this state is meant to be use on naming when the user don't specify an activity name
-  let [roundTime, setRoundTime] = useState('0');
+  let [roundTime, setRoundTime] = useState<DefaultTimeOptions>('0');
   // we want to turn on round rest if the user have global rest also turned on
   let [restActive, setRestActive] = useState(globalRest.active);
   // this state is meant to be use on naming when the user don't specify an activity name
-  let [restTime, setRestTime] = useState(globalRest.time);
+  let [restTime, setRestTime] = useState<DefaultTimeOptions>(globalRest.time);
 
   // iinpu box ref for the name of the activity also called label
   let labelRef: React.RefObject<HTMLInputElement> = useRef(null);
@@ -82,13 +83,13 @@ export default function AddNewRound(props: AddNewRoundProps) {
   }, [globalRest]);
 
   // here we will generate the list with the time options for an activity
-  const ACTIVITY = ['10', '20', '30', '45', '60', '180'];
+  const ACTIVITY: DefaultTimeOptions[] = ['10', '20', '30', '45', '60', '180'];
   const activityOptions = ACTIVITY.map((time) => (
     <TimeOptions key={`activity-${time}`} group='activity-time' time={time} />
   ));
 
   // here we will generate the list with the time options for an activity rest
-  const REST = ['5', '10', '20', '30', '45', '60'];
+  const REST: DefaultTimeOptions[] = ['5', '10', '20', '30', '45', '60'];
   const restOptions = REST.map((time) => (
     <TimeOptions
       key={`round-rest-${time}`}
