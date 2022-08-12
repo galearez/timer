@@ -1,22 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
+import { RestContext } from './app';
 
-interface GlobalRestFormProps {
-  setRestTime: (s: string) => void;
-  showSingleRest: (b: boolean) => void;
-}
+export default function GlobalRestForm() {
+  // this context will hold the state of the global rest form and the rest time
+  // also it will provide two callback to control the state from this component
+  let rest = useContext(RestContext);
 
-// 00000000000000000000000000000000000000000000000000000000000
-export default function GlobalRestForm(props: GlobalRestFormProps) {
-  let [globalRests, setGlobalRests] = useState(false);
-
+  // this function will toggle the global rest form
   function toggleRadioFieldset() {
-    setGlobalRests(!globalRests);
-    props.showSingleRest(!globalRests);
+    rest.setActive(!rest.active);
   }
 
+  // if we hide the form is precise to set the time to 0 to not polute the add round form
   useEffect(() => {
-    if (!globalRests) props.setRestTime('0');
-  }, [globalRests]);
+    if (!rest.active) rest.setTime('0');
+  }, [rest.active]);
 
   return (
     <form className='w-full md:mt-2 flex flex-col'>
@@ -26,12 +24,12 @@ export default function GlobalRestForm(props: GlobalRestFormProps) {
           <input
             type='checkbox'
             onChange={toggleRadioFieldset}
-            defaultChecked={globalRests}
+            defaultChecked={rest.active}
           />
           <span className='slider'></span>
         </label>
       </fieldset>
-      {globalRests && (
+      {rest.active && (
         <fieldset className='grid grid-cols-3 sm:grid-cols-6 gap-3 mt-1 sm:my-2'>
           <div className=' rounded-lg bg-gray-700 hover:bg-opacity-75'>
             <input
@@ -39,7 +37,7 @@ export default function GlobalRestForm(props: GlobalRestFormProps) {
               name='rest'
               id='rest-5'
               value={5}
-              onChange={(e) => props.setRestTime(e.target.value)}
+              onChange={(e) => rest.setTime(e.target.value)}
               hidden
             />
             <label
@@ -54,7 +52,7 @@ export default function GlobalRestForm(props: GlobalRestFormProps) {
               name='rest'
               id='rest-10'
               value={10}
-              onChange={(e) => props.setRestTime(e.target.value)}
+              onChange={(e) => rest.setTime(e.target.value)}
               hidden
             />
             <label
@@ -69,7 +67,7 @@ export default function GlobalRestForm(props: GlobalRestFormProps) {
               name='rest'
               id='rest-20'
               value={20}
-              onChange={(e) => props.setRestTime(e.target.value)}
+              onChange={(e) => rest.setTime(e.target.value)}
               hidden
             />
             <label
@@ -84,7 +82,7 @@ export default function GlobalRestForm(props: GlobalRestFormProps) {
               name='rest'
               id='rest-30'
               value={30}
-              onChange={(e) => props.setRestTime(e.target.value)}
+              onChange={(e) => rest.setTime(e.target.value)}
               hidden
             />
             <label
@@ -99,7 +97,7 @@ export default function GlobalRestForm(props: GlobalRestFormProps) {
               name='rest'
               id='rest-45'
               value={45}
-              onChange={(e) => props.setRestTime(e.target.value)}
+              onChange={(e) => rest.setTime(e.target.value)}
               hidden
             />
             <label
@@ -114,7 +112,7 @@ export default function GlobalRestForm(props: GlobalRestFormProps) {
               name='rest'
               id='rest-60'
               value={60}
-              onChange={(e) => props.setRestTime(e.target.value)}
+              onChange={(e) => rest.setTime(e.target.value)}
               hidden
             />
             <label

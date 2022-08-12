@@ -10,6 +10,20 @@ import clsx from 'clsx';
 
 import Icons from '../utils/icons';
 
+// this context will pass the control of the rest states to the global rest component
+export const RestContext = React.createContext({
+  active: false,
+  time: '0',
+  setActive: (value: boolean) => {},
+  setTime: (time: string) => {},
+});
+
+// this context will pass read-only values to the add round form to set the default state of the rest time
+export const GlobalRestContext = React.createContext({
+  active: false,
+  time: '0',
+});
+
 // this component will handle the user input and will pass main data, rounds (id, label and time)
 // to the other components
 export default function App() {
@@ -21,11 +35,8 @@ export default function App() {
   let currentActivity = useAppSelector((state) => state.current.value);
   let mountCountdown = useAppSelector((state) => state.mountCountdown.value);
   // these states control when the user selects to add a rest after each avtivity
-  let [globalRestActive, setGlobalRestActive] = useState(false);
-  let [globalRestTime, setGlobalRestTime] = useState('0');
-  // these states control when the user selects to add a rest after the current activity
-  let [roundRestActive, setRoundRestActive] = useState(false);
-  let [roundRestTime, setRoundRestTime] = useState('0');
+  let [restActive, setRestActive] = useState(false);
+  let [restTime, setRestTime] = useState('0');
   // this state is a boolean becuase is used to show the main input form based on the viewport size
   let [addRoundFormActive, setAddRoundFormActive] = useState(false);
   // this state is meant to unmount the home UI and mount/unmount the countdown component
@@ -53,29 +64,6 @@ export default function App() {
       return setAddRoundFormActive(false);
     }
   }, [screenWidth]);
-
-  // this effect will get the rest time comming from the global rest form to store it and
-  // pass it to the add round form
-  useEffect(() => {
-    setRoundRestTime(globalRestTime);
-  }, [setGlobalRestTime, globalRestTime]);
-
-  // this callback will toggle the round rest form from the GlobalRestForm component
-  const setRoundRestActiveCallback = useCallback(
-    (isOpen: boolean) => {
-      setGlobalRestActive(isOpen);
-      setRoundRestActive(isOpen);
-    },
-    [setRoundRestActive, setGlobalRestActive]
-  );
-
-  // this callback will pass the value selected from GlobalRestForm to the round form to add a new round
-  const setGlobalRestTimeCallback = useCallback(
-    (time: string) => {
-      setGlobalRestTime(time);
-    },
-    [setGlobalRestTime]
-  );
 
   // this callback is meant to close the add round form once the user adds a new round in screens < sm
   const closeActivityFormCallback = useCallback(() => {
@@ -113,10 +101,15 @@ export default function App() {
           )}
         </header>
         {!closeHomeScreen && (
-          <GlobalRestForm
-            setRestTime={setGlobalRestTimeCallback}
-            showSingleRest={setRoundRestActiveCallback}
-          />
+          <RestContext.Provider
+            value={{
+              active: restActive,
+              time: restTime,
+              setActive: setRestActive,
+              setTime: setRestTime,
+            }}>
+            <GlobalRestForm />
+          </RestContext.Provider>
         )}
         {!closeHomeScreen && (
           <div>
@@ -131,11 +124,13 @@ export default function App() {
           </div>
         )}
         {!closeHomeScreen && addRoundFormActive && (
-          <AddNewRound
-            globalRest={globalRestActive}
-            globalRestTime={roundRestTime}
-            closeActivityForm={closeActivityFormCallback}
-          />
+          <GlobalRestContext.Provider
+            value={{
+              active: restActive,
+              time: restTime,
+            }}>
+            <AddNewRound closeActivityForm={closeActivityFormCallback} />
+          </GlobalRestContext.Provider>
         )}
         {closeHomeScreen && (
           <div>

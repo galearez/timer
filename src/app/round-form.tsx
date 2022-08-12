@@ -1,27 +1,28 @@
-import { useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { useAppDispatch } from '../hooks';
 import { addRound } from './routine-slice';
 import { v4 as uuidv4 } from 'uuid';
+import { GlobalRestContext } from './app';
 
 interface AddNewRoundProps {
-  globalRest: boolean;
-  globalRestTime: string;
   closeActivityForm: () => void;
 }
 
 export default function AddNewRound(props: AddNewRoundProps) {
   const dispatch = useAppDispatch();
 
-  // we want to turn on round rest if the user have global rest also turned on
-  let [singleRest, setSingleRest] = useState(props.globalRest);
+  // this context will hold read-only values of the state of the global rest
+  const globalRest = useContext(GlobalRestContext);
   // this state is meant to be use on naming when the user don't specify an activity name
   let [activityDefaultName, setActivityDefaultName] = useState(1);
   // this state is meant to be use on naming when the user don't specify an activity name
-  let [restTime, setRestTime] = useState(props.globalRestTime);
-  // this state is meant to be use on naming when the user don't specify an activity name
   let [roundTime, setRoundTime] = useState('0');
+  // we want to turn on round rest if the user have global rest also turned on
+  let [restActive, setRestActive] = useState(globalRest.active);
+  // this state is meant to be use on naming when the user don't specify an activity name
+  let [restTime, setRestTime] = useState(globalRest.time);
 
-  // user input box references
+  // iinpu box ref for the name of the activity also called label
   let labelRef: React.RefObject<HTMLInputElement> = useRef(null);
 
   // this function get the values from the user and assign them to the routine state
@@ -55,26 +56,26 @@ export default function AddNewRound(props: AddNewRoundProps) {
 
     // add a rest after the round if the user has the singleRest switch enabled, this
     // way the user can turn off the singleRest if they don't need reste after the new activity
-    if (singleRest && restTimeSec !== 0) {
+    if (restActive && restTimeSec !== 0) {
       dispatch(addRound({ id: uuidv4(), label: 'Rest', time: restTimeSec }));
     }
 
     // reset the values of the single rests to 0, if there are global rests they will be reset to that value
     setRoundTime('0');
-    setRestTime(props.globalRestTime);
-    setSingleRest(props.globalRest);
+    setRestTime(globalRest.time);
+    setRestActive(globalRest.active);
     props.closeActivityForm();
   }
 
   // on screens > sm, the globalRests form didn't affected the singleRest from this
   // two effects will listen to the changes in globalRests
   useEffect(() => {
-    setSingleRest(props.globalRest);
-  }, [props.globalRest]);
+    setRestActive(globalRest.active);
+  }, [globalRest]);
 
   useEffect(() => {
-    setRestTime(props.globalRestTime);
-  }, [props.globalRestTime]);
+    setRestTime(globalRest.time);
+  }, [globalRest]);
 
   return (
     <div className='absolute md:relative top-0 left-0 w-full h-full'>
@@ -202,8 +203,8 @@ export default function AddNewRound(props: AddNewRoundProps) {
             <label className='toggle-switch '>
               <input
                 type='checkbox'
-                onChange={() => setSingleRest(!singleRest)}
-                checked={singleRest}
+                onChange={() => setRestActive(!restActive)}
+                checked={restActive}
               />
               <span className='slider'></span>
             </label>
