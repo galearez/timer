@@ -1,15 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useAppSelector, useAppDispatch } from '../hooks';
-import { mount } from './mount-countdown-slice';
-import { restart } from '../countdown/current-slice';
+import { useAppSelector } from '../hooks';
 import Countdown from '../countdown';
 import GlobalRestForm from './global-rest-form';
 import AddNewRound from './round-form';
 import ActivitiesList from './activities-list';
 import clsx from 'clsx';
 
-import Icons from '../utils/icons';
 import NextActivity from './next-activity';
+import NavBar from './navbar';
 
 // this context will pass the control of the rest states to the global rest component
 export const RestContext = React.createContext({
@@ -25,12 +23,23 @@ export const GlobalRestContext = React.createContext({
   time: '0',
 });
 
+type ViewsType = 'home' | 'countdown';
+
+interface ViewContextTypes {
+  current: ViewsType;
+  set: (s: ViewsType) => void;
+}
+
+export const ViewContext = React.createContext<ViewContextTypes>({
+  current: 'home',
+  set: () => {},
+});
+
 // this component will handle the user input and will pass main data, rounds (id, label and time)
 // to the other components
 export default function App() {
   let [screenWidth, setScreenWidth] = useState(window.innerWidth);
 
-  const dispatch = useAppDispatch();
   // these are global states controlled by redux
   let routine = useAppSelector((state) => state.routine.value);
   let currentActivity = useAppSelector((state) => state.current.value);
@@ -41,7 +50,7 @@ export default function App() {
   // this state is a boolean becuase is used to show the main input form based on the viewport size
   let [addRoundFormActive, setAddRoundFormActive] = useState(false);
   // this state is meant to unmount the home UI and mount/unmount the countdown component
-  let [closeHomeScreen, setCloseHomeScreen] = useState(false);
+  let [view, setView] = useState<ViewsType>('home');
 
   useEffect(() => {
     window.addEventListener('resize', () => setScreenWidth(window.innerWidth));
@@ -78,30 +87,12 @@ export default function App() {
       <div
         className={clsx(
           'flex flex-col justify-between',
-          closeHomeScreen ? 'h-screen' : 'h-auto'
+          view === 'countdown' ? 'h-screen' : 'h-auto'
         )}>
-        <header className='flex justify-between items-center'>
-          <h1>Timer</h1>
-          {!closeHomeScreen ? (
-            <button
-              className='font-bold text-white py-2 px-4 rounded-md bg-gradient-to-r from-mint to-lime'
-              onClick={() => {
-                if (routine.length !== 0) {
-                  dispatch(mount());
-                  setCloseHomeScreen(true);
-                }
-              }}>
-              Start routine
-            </button>
-          ) : (
-            <button
-              className='font-bold text-white py-2 px-4 rounded-md bg-gray-700'
-              onClick={() => dispatch(restart())}>
-              Restart all <Icons value={'restore'} />
-            </button>
-          )}
-        </header>
-        {!closeHomeScreen && (
+        <ViewContext.Provider value={{ current: view, set: setView }}>
+          <NavBar />
+        </ViewContext.Provider>
+        {view === 'home' && (
           <RestContext.Provider
             value={{
               active: restActive,
@@ -112,7 +103,7 @@ export default function App() {
             <GlobalRestForm />
           </RestContext.Provider>
         )}
-        {!closeHomeScreen && (
+        {view === 'home' && (
           <div>
             <hr className='w-9/12 m-auto mt-2 md:my-2' />
             <button
@@ -124,7 +115,7 @@ export default function App() {
             </button>
           </div>
         )}
-        {!closeHomeScreen && addRoundFormActive && (
+        {view === 'home' && addRoundFormActive && (
           <GlobalRestContext.Provider
             value={{
               active: restActive,
@@ -133,7 +124,7 @@ export default function App() {
             <AddNewRound closeActivityForm={closeActivityFormCallback} />
           </GlobalRestContext.Provider>
         )}
-        {closeHomeScreen && (
+        {view === 'countdown' && (
           <div>
             {mountCountdown ? (
               <Countdown />
@@ -144,7 +135,7 @@ export default function App() {
             )}
           </div>
         )}
-        {closeHomeScreen && (
+        {view === 'countdown' && (
           <NextActivity currentActivity={currentActivity} routine={routine} />
         )}
       </div>
