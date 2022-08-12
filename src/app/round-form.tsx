@@ -3,7 +3,7 @@ import { useAppDispatch } from '../hooks';
 import { addRound } from './routine-slice';
 import { v4 as uuidv4 } from 'uuid';
 import { GlobalRestContext } from '../app';
-import TimeOptions from './time-options';
+import TimeButtons from '../time-buttons';
 import { TimeContext } from './time.context';
 
 type DefaultTimeOptions = '0' | '5' | '10' | '20' | '30' | '45' | '60' | '180';
@@ -85,13 +85,13 @@ export default function AddNewRound(props: AddNewRoundProps) {
   // here we will generate the list with the time options for an activity
   const ACTIVITY: DefaultTimeOptions[] = ['10', '20', '30', '45', '60', '180'];
   const activityOptions = ACTIVITY.map((time) => (
-    <TimeOptions key={`activity-${time}`} group='activity-time' time={time} />
+    <TimeButtons key={`activity-${time}`} group='activity-time' time={time} />
   ));
 
   // here we will generate the list with the time options for an activity rest
   const REST: DefaultTimeOptions[] = ['5', '10', '20', '30', '45', '60'];
   const restOptions = REST.map((time) => (
-    <TimeOptions
+    <TimeButtons
       key={`round-rest-${time}`}
       group='round-rest-time'
       time={time}
