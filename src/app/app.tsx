@@ -54,19 +54,6 @@ export default function App() {
     }
   }, [screenWidth]);
 
-  // this function will handle all the fields where the input can add data, they will only be rendered
-  // once the user need them in mobile, in screens > 768, they will be rendered by default and the only
-  // conditional rendering will be the other components
-  function handleToggleFieldset(
-    field: 'globalRests' | 'activityForm' | 'singleRest'
-  ) {
-    if (field === 'activityForm')
-      return setAddRoundFormActive(!addRoundFormActive);
-    if (field === 'singleRest') return setRoundRestActive(!roundRestActive);
-    setGlobalRestActive(!globalRestActive);
-    setRoundRestActive(!globalRestActive);
-  }
-
   // this effect will get the rest time comming from the global rest form to store it and
   // pass it to the add round form
   useEffect(() => {
@@ -137,10 +124,7 @@ export default function App() {
             <button
               className='font-bold block md:hidden w-3/5 text-white py-2 px-4 m-auto mt-2 rounded-md bg-gray-600'
               onClick={() => {
-                handleToggleFieldset('activityForm');
-                if (globalRestActive) {
-                  setRoundRestActive(true);
-                }
+                setAddRoundFormActive(!addRoundFormActive);
               }}>
               New Round
             </button>
