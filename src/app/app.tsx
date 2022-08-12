@@ -21,13 +21,13 @@ export default function App() {
   let currentActivity = useAppSelector((state) => state.current.value);
   let mountCountdown = useAppSelector((state) => state.mountCountdown.value);
   // these states control when the user selects to add a rest after each avtivity
-  let [globalRests, setGlobalRests] = useState(false);
-  let [secGlobalRest, setSecGlobalRest] = useState('0');
+  let [globalRestActive, setGlobalRestActive] = useState(false);
+  let [globalRestTime, setGlobalRestTime] = useState('0');
   // these states control when the user selects to add a rest after the current activity
-  let [singleRest, setSingleRest] = useState(false);
-  let [secSingleRest, setSecSingleRest] = useState('0');
+  let [roundRestActive, setRoundRestActive] = useState(false);
+  let [roundRestTime, setRoundRestTime] = useState('0');
   // this state is a boolean becuase is used to show the main input form based on the viewport size
-  let [activityForm, setActivityForm] = useState(false);
+  let [addRoundFormActive, setAddRoundFormActive] = useState(false);
   // this state is meant to unmount the home UI and mount/unmount the countdown component
   let [closeHomeScreen, setCloseHomeScreen] = useState(false);
 
@@ -45,12 +45,12 @@ export default function App() {
   // when screen resize it will be called to change the screenWidth state which control some responsive rendering
   useEffect(() => {
     if (screenWidth > 767) {
-      return setActivityForm(true);
+      return setAddRoundFormActive(true);
     }
 
     //if the user shrinks the screen below 768 it will close the activity form component
     if (screenWidth < 768) {
-      return setActivityForm(false);
+      return setAddRoundFormActive(false);
     }
   }, [screenWidth]);
 
@@ -60,39 +60,42 @@ export default function App() {
   function handleToggleFieldset(
     field: 'globalRests' | 'activityForm' | 'singleRest'
   ) {
-    if (field === 'activityForm') return setActivityForm(!activityForm);
-    if (field === 'singleRest') return setSingleRest(!singleRest);
-    setGlobalRests(!globalRests);
-    setSingleRest(!globalRests);
+    if (field === 'activityForm')
+      return setAddRoundFormActive(!addRoundFormActive);
+    if (field === 'singleRest') return setRoundRestActive(!roundRestActive);
+    setGlobalRestActive(!globalRestActive);
+    setRoundRestActive(!globalRestActive);
   }
 
+  // this effect will get the rest time comming from the global rest form to store it and
+  // pass it to the add round form
   useEffect(() => {
-    setSecSingleRest(secGlobalRest);
-  }, [setSecGlobalRest, secGlobalRest]);
+    setRoundRestTime(globalRestTime);
+  }, [setGlobalRestTime, globalRestTime]);
 
   // this callback will toggle the round rest form from the GlobalRestForm component
-  const setSingleRestCallback = useCallback(
+  const setRoundRestActiveCallback = useCallback(
     (isOpen: boolean) => {
-      setGlobalRests(isOpen);
-      setSingleRest(isOpen);
+      setGlobalRestActive(isOpen);
+      setRoundRestActive(isOpen);
     },
-    [setSingleRest, setGlobalRests]
+    [setRoundRestActive, setGlobalRestActive]
   );
 
   // this callback will pass the value selected from GlobalRestForm to the round form to add a new round
-  const setRestTimeCallback = useCallback(
+  const setGlobalRestTimeCallback = useCallback(
     (time: string) => {
-      setSecGlobalRest(time);
+      setGlobalRestTime(time);
     },
-    [setSecGlobalRest]
+    [setGlobalRestTime]
   );
 
-  //
+  // this callback is meant to close the add round form once the user adds a new round in screens < sm
   const closeActivityFormCallback = useCallback(() => {
     if (screenWidth < 768) {
-      setActivityForm(false);
+      setAddRoundFormActive(false);
     }
-  }, [setActivityForm, screenWidth]);
+  }, [setAddRoundFormActive, screenWidth]);
 
   return (
     <div className='w-full max-w-xl m-auto md:grid grid-cols-1'>
@@ -124,8 +127,8 @@ export default function App() {
         </header>
         {!closeHomeScreen && (
           <GlobalRestForm
-            setRestTime={setRestTimeCallback}
-            showSingleRest={setSingleRestCallback}
+            setRestTime={setGlobalRestTimeCallback}
+            showSingleRest={setRoundRestActiveCallback}
           />
         )}
         {!closeHomeScreen && (
@@ -135,18 +138,18 @@ export default function App() {
               className='font-bold block md:hidden w-3/5 text-white py-2 px-4 m-auto mt-2 rounded-md bg-gray-600'
               onClick={() => {
                 handleToggleFieldset('activityForm');
-                if (globalRests) {
-                  setSingleRest(true);
+                if (globalRestActive) {
+                  setRoundRestActive(true);
                 }
               }}>
               New Round
             </button>
           </div>
         )}
-        {!closeHomeScreen && activityForm && (
+        {!closeHomeScreen && addRoundFormActive && (
           <AddNewRound
-            globalRest={globalRests}
-            globalRestTime={secSingleRest}
+            globalRest={globalRestActive}
+            globalRestTime={roundRestTime}
             closeActivityForm={closeActivityFormCallback}
           />
         )}
