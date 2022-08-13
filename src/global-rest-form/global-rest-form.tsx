@@ -28,7 +28,7 @@ export default function GlobalRestForm() {
   ));
 
   return (
-    <form className='w-full md:mt-2 flex flex-col'>
+    <form className='w-full flex flex-col'>
       <fieldset className='text-lg mt-2 flex justify-between items-center'>
         <h2>Repeat rest</h2>
         <label className='toggle-switch'>
@@ -41,7 +41,7 @@ export default function GlobalRestForm() {
         </label>
       </fieldset>
       {rest.active && (
-        <fieldset className='grid grid-cols-3 sm:grid-cols-6 gap-3 mt-1 sm:my-2'>
+        <fieldset className='grid grid-cols-3 sm:grid-cols-6 gap-3 mt-2'>
           <TimeContext.Provider
             value={{
               value: rest.time,

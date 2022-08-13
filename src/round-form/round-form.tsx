@@ -130,19 +130,21 @@ export default function AddNewRound(props: AddNewRoundProps) {
             {activityOptions}
           </TimeContext.Provider>
         </fieldset>
-        <fieldset className='bg-gray-700 mb-2 px-2 pb-2 rounded-md'>
-          <span className='mt-1 flex justify-between items-center'>
-            <h2>Rest</h2>
-            <label className='toggle-switch '>
-              <input
-                type='checkbox'
-                onChange={() => setRestActive(!restActive)}
-                checked={restActive}
-              />
-              <span className='slider'></span>
-            </label>
-          </span>
-          <div className='grid grid-cols-3 sm:grid-cols-6 gap-3 mt-1 sm:mt-2'>
+        <fieldset className='bg-gray-700 p-2 rounded-t-md flex justify-between items-center'>
+          <h2>Rest</h2>
+          <label className='toggle-switch '>
+            <input
+              type='checkbox'
+              onChange={() => setRestActive(!restActive)}
+              checked={restActive}
+            />
+            <span className='slider'></span>
+          </label>
+        </fieldset>
+        <fieldset
+          className='round-rest bg-gray-700 mb-2 px-2 pb-2 rounded-b-md'
+          disabled={restActive ? false : true}>
+          <div className='grid grid-cols-3 sm:grid-cols-6 gap-3 sm:mt-2'>
             <TimeContext.Provider
               value={{
                 value: restTime,

@@ -116,9 +116,9 @@ export default function App() {
         )}
         {view === 'home' && (
           <div>
-            <hr className='w-9/12 m-auto mt-2 md:my-2' />
+            <hr className='w-9/12 m-auto my-2' />
             <button
-              className='font-bold block md:hidden w-3/5 text-white py-2 px-4 m-auto mt-2 rounded-md bg-gray-600'
+              className='font-bold block md:hidden w-3/5 text-white py-2 px-4 m-auto rounded-md bg-gray-600'
               onClick={() => {
                 setAddRoundFormActive(!addRoundFormActive);
               }}>
