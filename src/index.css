@@ -62,9 +62,7 @@
   .round-rest:disabled::before {
     content: '';
     position: absolute;
-    left: 0;
-    width: 100%;
-    height: 50px;
     background-color: rgba(64, 64, 64, 0.5);
+    @apply h-24 sm:h-12 w-11/12 sm:w-full sm:left-0;
   }
 }
