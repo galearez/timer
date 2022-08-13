@@ -4,10 +4,9 @@ import Countdown from './countdown';
 import GlobalRestForm from './global-rest-form';
 import AddNewRound from './round-form/round-form';
 import ActivitiesList from './activities-list';
-import clsx from 'clsx';
-
-import NextActivity from './app/next-activity';
+import NextActivity from './next-activity/next-activity';
 import NavBar from './navbar';
+import clsx from 'clsx';
 
 type DefaultTimeOptions = '0' | '5' | '10' | '20' | '30' | '45' | '60' | '180';
 
