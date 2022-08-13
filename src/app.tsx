@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useAppSelector } from './hooks';
 import Countdown from './countdown';
 import GlobalRestForm from './global-rest-form';
-import AddNewRound from './app/round-form';
+import AddNewRound from './round-form/round-form';
 import ActivitiesList from './activities-list';
 import clsx from 'clsx';
 

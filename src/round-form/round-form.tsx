@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useAppDispatch } from '../hooks';
-import { addRound } from './routine-slice';
+import { addRound } from '../app/routine-slice';
 import { v4 as uuidv4 } from 'uuid';
 import { GlobalRestContext } from '../app';
 import TimeButtons from '../time-buttons';
-import { TimeContext } from './time.context';
+import { TimeContext } from '../app/time.context';
 
 type DefaultTimeOptions = '0' | '5' | '10' | '20' | '30' | '45' | '60' | '180';
 interface AddNewRoundProps {
