@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { useContext } from 'react';
-import { TimeContext } from '../app/time.context';
+import { TimeContext } from '../app/time-context';
 
 type DefaultTimeOptions = '0' | '5' | '10' | '20' | '30' | '45' | '60' | '180';
 

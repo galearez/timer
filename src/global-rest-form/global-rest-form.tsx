@@ -1,7 +1,7 @@
 import { useContext, useEffect } from 'react';
 import { RestContext } from '../app';
 import TimeOptions from '../time-buttons';
-import { TimeContext } from '../app/time.context';
+import { TimeContext } from '../app/time-context';
 
 type DefaultTimeOptions = '0' | '5' | '10' | '20' | '30' | '45' | '60' | '180';
 
