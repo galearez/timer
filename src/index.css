@@ -56,4 +56,13 @@
   .toggle-switch input:checked + .slider::before {
     transform: translateX(24px);
   }
+  input:checked ~ .radio {
+    @apply text-white bg-mint;
+  }
+  .round-rest:disabled::before {
+    content: '';
+    position: absolute;
+    background-color: rgba(64, 64, 64, 0.5);
+    @apply h-24 sm:h-12 w-11/12 sm:w-full sm:left-0;
+  }
 }

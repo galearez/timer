@@ -1,17 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../app/hooks';
-import { next, previous, restart } from './currentSlice';
-import { unmount } from './mountCountdownSlice';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useAppDispatch, useAppSelector } from '../hooks';
+import { next } from './current-slice';
+import { unmount } from '../app/mount-countdown-slice';
+import TimerControls from './timer-controls';
 
-import Icons from '../utils/icons';
-
-// this type will ensure the buttonState is a number with 3 possible values
-type ButtonDisable = 'left' | 'none' | 'right';
-
-function Countdown() {
+export default function Countdown() {
   const dispatch = useAppDispatch();
-
-  const routine = useAppSelector((state) => state.rotuine.value);
+  const routine = useAppSelector((state) => state.routine.value);
   let currentActivity = useAppSelector((state) => state.current.value);
 
   const time = routine ? routine[0].time : 0;
@@ -19,43 +14,41 @@ function Countdown() {
   let [countdownTime, setCountdownTime] = useState(time);
   let [minutes, setMinutes] = useState(Math.floor(time / 60));
   let [seconds, setSeconds] = useState(time % 60);
-  let [isPaused, setIsPaused] = useState(false);
-  let [disableButton, setDisableButton] = useState<ButtonDisable>('left');
-  let disableAllMoveButtons = routine.length === 1;
 
   // this class variable will hold the setInterval, their only purpose is to be able to clear the interval
   let interval = useRef<number>();
-  const oneSecond = 1000;
-  let [expectedTime, setExpectedTime] = useState(Date.now() + oneSecond);
-  let [intervalTime, setIntervalTime] = useState(oneSecond);
+  const ONE_SECOND = 1000;
+  let [expectedTime, setExpectedTime] = useState(Date.now() + ONE_SECOND);
+  let [intervalTime, setIntervalTime] = useState(ONE_SECOND);
 
   // once the component mounts it will start a countdown, the original value is the one passed as a prop to
   // the component and it will run until the 'countdownTime' is 0
   useEffect(() => {
     interval.current = window.setInterval(() => {
       let drift = Date.now() - expectedTime;
-      if (drift > oneSecond) {
+      if (drift > ONE_SECOND) {
         clearInterval(interval.current);
-        window.confirm(
-          'Something went wrong. \n Do you you want to refresh your tab?'
-        ) && window.location.reload();
-        return;
+        return (
+          window.confirm(
+            'Something went wrong. \n Do you you want to refresh your tab?'
+          ) && window.location.reload()
+        );
       }
 
       if (countdownTime <= 0) {
         dispatch(next());
-        clearInterval(interval.current);
+        return clearInterval(interval.current);
       }
 
       setCountdownTime(countdownTime - 1);
-      setExpectedTime((prevState) => prevState + oneSecond);
+      setExpectedTime((prevState) => prevState + ONE_SECOND);
       setIntervalTime(Math.max(0, intervalTime - drift));
     }, intervalTime);
 
     return () => {
       clearInterval(interval.current);
     };
-  }, [countdownTime, dispatch, intervalTime, expectedTime, oneSecond]);
+  }, [countdownTime, dispatch, intervalTime, expectedTime, ONE_SECOND]);
 
   useEffect(() => {
     setMinutes(Math.floor(countdownTime / 60));
@@ -64,60 +57,30 @@ function Countdown() {
 
   useEffect(() => {
     if (currentActivity < routine.length) {
+      setExpectedTime(Date.now() + ONE_SECOND);
       setCountdownTime(routine[currentActivity].time);
     }
 
     if (currentActivity >= routine.length) {
       dispatch(unmount());
     }
-
-    if (currentActivity === routine.length - 1) {
-      setDisableButton('right');
-    } else if (currentActivity === 0) {
-      setDisableButton('left');
-    } else {
-      setDisableButton('none');
-    }
   }, [currentActivity, routine, dispatch]);
 
-  // this function will remove the setInterval to stop the countdown
-  function stopCountdown() {
+  const setCurrentActivityTime = useCallback(() => {
+    setCountdownTime(routine[currentActivity].time);
+  }, [setCountdownTime, routine, currentActivity]);
+
+  const substractOneSecond = useCallback(() => {
+    setCountdownTime(countdownTime - 1);
+  }, [setCountdownTime, countdownTime]);
+
+  const clearIntervalCallback = useCallback(() => {
     clearInterval(interval.current);
-    setIsPaused(true);
-  }
+  }, [interval]);
 
-  // this function will restart the countdown
-  function resumeCountdown() {
-    setIsPaused(false);
-    let resume: any = setTimeout(() => {
-      setCountdownTime(countdownTime - 1);
-
-      return clearTimeout(resume);
-    }, 1000);
-  }
-
-  // this function will restart the current activity
-  function restartActivity() {
-    dispatch(restart());
-    setCountdownTime(routine[currentActivity].time);
-  }
-
-  // this function will unmount the current activity and will mount the next activity if there is one
-  function nextActivity() {
-    dispatch(next());
-    if (isPaused) {
-      setIsPaused(false);
-    }
-  }
-
-  // this function will unmount the current activity and will mount the previous activity if there is one
-  function previousActivity() {
-    dispatch(previous());
-    setCountdownTime(routine[currentActivity].time);
-    if (isPaused) {
-      setIsPaused(false);
-    }
-  }
+  const setExpectedTimeCallback = useCallback(() => {
+    setExpectedTime(Date.now() + ONE_SECOND);
+  }, [setExpectedTime]);
 
   return (
     <div className='font-bold h-80 flex flex-col justify-center items-center'>
@@ -128,50 +91,13 @@ function Countdown() {
           {seconds < 10 ? <span>0{seconds}</span> : <span>{seconds}</span>}
         </span>
       </div>
-      <div className='w-full max-w-md flex justify-around items-center'>
-        {!disableAllMoveButtons && (
-          <button
-            className='rounded-full w-12 h-12 bg-gray-700 disabled:bg-gray-900'
-            disabled={disableButton === 'left'}
-            onClick={previousActivity}
-          >
-            <Icons value={'previous'} disable={disableButton === 'left'} />
-          </button>
-        )}
-
-        <button
-          className='rounded-full w-14 h-14 bg-gray-700'
-          onClick={restartActivity}
-        >
-          <Icons value={'replay'} />
-        </button>
-        {isPaused ? (
-          <button
-            className='rounded-full w-16 h-16 bg-mint'
-            onClick={resumeCountdown}
-          >
-            <Icons value={'play'} />
-          </button>
-        ) : (
-          <button
-            className='rounded-full w-16 h-16 bg-gray-700'
-            onClick={stopCountdown}
-          >
-            <Icons value={'pause'} />
-          </button>
-        )}
-        {!disableAllMoveButtons && (
-          <button
-            className='rounded-full w-12 h-12 bg-gray-700 disabled:bg-gray-900'
-            disabled={disableButton === 'right'}
-            onClick={nextActivity}
-          >
-            <Icons value={'next'} disable={disableButton === 'right'} />
-          </button>
-        )}
-      </div>
+      <TimerControls
+        routineLength={routine.length}
+        setCurrentActivityTime={setCurrentActivityTime}
+        substractOneSecond={substractOneSecond}
+        clearIntervalCallback={clearIntervalCallback}
+        setExpectedTimeCallback={setExpectedTimeCallback}
+      />
     </div>
   );
 }
-
-export default Countdown;

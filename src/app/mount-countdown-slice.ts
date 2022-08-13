@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { RootState } from '../app/store';
+import { RootState } from '../store';
 
 const mountCountdownSlice = createSlice({
   name: 'mountCountdown',
@@ -7,10 +7,10 @@ const mountCountdownSlice = createSlice({
     value: false,
   },
   reducers: {
-    mount: (state) => {
+    mount(state) {
       state.value = true;
     },
-    unmount: (state) => {
+    unmount(state) {
       state.value = false;
     },
   },
