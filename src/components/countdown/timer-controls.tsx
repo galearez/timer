@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../hooks';
-import { next, previous } from '../app/current-slice';
+import { useAppDispatch, useAppSelector } from '../../hooks';
+import { next, previous } from '../../app/current-slice';
 
-import Icons from '../utils/icons';
+import Icons from '../../utils/icons';
 
 interface ButtonControlsProps {
   routineLength: number;

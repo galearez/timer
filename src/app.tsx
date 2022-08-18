@@ -1,11 +1,11 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useAppSelector } from './hooks';
-import Countdown from './countdown';
-import GlobalRestForm from './global-rest-form';
-import AddNewRound from './round-form/round-form';
-import ActivitiesList from './activities-list';
-import NextActivity from './next-activity/next-activity';
-import NavBar from './navbar';
+import Countdown from './components/countdown';
+import GlobalRestForm from './components/global-rest-form';
+import AddNewRound from './components/round-form/round-form';
+import ActivitiesList from './components/activities-list';
+import NextActivity from './components/next-activity/next-activity';
+import NavBar from './components/navbar';
 import clsx from 'clsx';
 
 type DefaultTimeOptions = '0' | '5' | '10' | '20' | '30' | '45' | '60' | '180';

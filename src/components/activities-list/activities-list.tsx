@@ -1,6 +1,6 @@
-import { useAppDispatch } from '../hooks';
-import { removeRound } from '../app/routine-slice';
-import Icons from '../utils/icons';
+import { useAppDispatch } from '../../hooks';
+import { removeRound } from '../../app/routine-slice';
+import Icons from '../../utils/icons';
 
 interface Activities {
   id: string;

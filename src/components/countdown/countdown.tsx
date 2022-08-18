@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '../hooks';
-import { next } from '../app/current-slice';
-import { unmount } from '../app/mount-countdown-slice';
+import { useAppDispatch, useAppSelector } from '../../hooks';
+import { next } from '../../app/current-slice';
+import { unmount } from '../../app/mount-countdown-slice';
 import TimerControls from './timer-controls';
 
 export default function Countdown() {
