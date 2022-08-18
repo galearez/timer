@@ -5,10 +5,17 @@ import { TimeContext } from '../../app/time-context';
 
 type DefaultTimeOptions = '0' | '5' | '10' | '20' | '30' | '45' | '60' | '180';
 
+interface RestContextTypes {
+  active: boolean;
+  time: DefaultTimeOptions;
+  setActive: (v: boolean) => void;
+  setTime: (t: DefaultTimeOptions) => void;
+}
+
 export default function GlobalRestForm() {
   // this context will hold the state of the global rest form and the rest time
   // also it will provide two callback to control the state from this component
-  let rest = useContext(RestContext);
+  let rest = useContext(RestContext) as RestContextTypes;
 
   // this function will toggle the global rest form
   function toggleRadioFieldset() {

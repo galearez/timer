@@ -18,21 +18,13 @@ interface RestContextTypes {
 }
 
 // this context will pass the control of the rest states to the global rest component
-export const RestContext = React.createContext<RestContextTypes>({
-  active: false,
-  time: '0',
-  setActive: (value: boolean) => {},
-  setTime: (time: DefaultTimeOptions) => {},
-});
+export const RestContext = React.createContext<RestContextTypes | null>(null);
 
 // this context will pass read-only values to the add round form to set the default state of the rest time
 export const GlobalRestContext = React.createContext<{
   active: boolean;
   time: DefaultTimeOptions;
-}>({
-  active: false,
-  time: '0',
-});
+} | null>(null);
 
 type ViewsType = 'home' | 'countdown';
 
@@ -41,10 +33,7 @@ interface ViewContextTypes {
   set: (s: ViewsType) => void;
 }
 
-export const ViewContext = React.createContext<ViewContextTypes>({
-  current: 'home',
-  set: () => {},
-});
+export const ViewContext = React.createContext<ViewContextTypes | null>(null);
 
 // this component will handle the user input and will pass main data, rounds (id, label and time)
 // to the other components

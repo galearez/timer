@@ -5,10 +5,16 @@ import { mount } from '../../app/mount-countdown-slice';
 import { restart } from '../../app/current-slice';
 import Icons from '../../utils/icons';
 
+type ViewsType = 'home' | 'countdown';
+interface ViewContextTypes {
+  current: ViewsType;
+  set: (s: ViewsType) => void;
+}
+
 export default function NavBar() {
   const dispatch = useAppDispatch();
   const routine = useAppSelector((state) => state.routine.value);
-  const view = useContext(ViewContext);
+  const view = useContext(ViewContext) as ViewContextTypes;
 
   return (
     <nav className='flex justify-between items-center'>
@@ -21,13 +27,15 @@ export default function NavBar() {
               dispatch(mount());
               view.set('countdown');
             }
-          }}>
+          }}
+        >
           Start routine
         </button>
       ) : (
         <button
           className='font-bold text-white py-2 px-4 rounded-md bg-gray-700'
-          onClick={() => dispatch(restart())}>
+          onClick={() => dispatch(restart())}
+        >
           Restart all <Icons value={'restore'} />
         </button>
       )}

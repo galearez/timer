@@ -11,13 +11,18 @@ interface AddNewRoundProps {
   closeActivityForm: () => void;
 }
 
+interface GlobalContextType {
+  active: boolean;
+  time: DefaultTimeOptions;
+}
+
 // crear un reducer para activity default name, porque no está guardando el valor en moviles
 
 export default function AddNewRound(props: AddNewRoundProps) {
   const dispatch = useAppDispatch();
 
   // this context will hold read-only values of the state of the global rest
-  const globalRest = useContext(GlobalRestContext);
+  const globalRest = useContext(GlobalRestContext) as GlobalContextType;
   // this state is meant to be use on naming when the user don't specify an activity name
   let [activityDefaultName, setActivityDefaultName] = useState(1);
   // this state is meant to be use on naming when the user don't specify an activity name
