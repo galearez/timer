@@ -2,7 +2,7 @@ import { useContext } from 'react';
 import { useAppSelector, useAppDispatch } from '../hooks';
 import { ViewContext } from '../app';
 import { mount } from '../app/mount-countdown-slice';
-import { restart } from '../countdown/current-slice';
+import { restart } from '../app/current-slice';
 import Icons from '../utils/icons';
 
 export default function NavBar() {

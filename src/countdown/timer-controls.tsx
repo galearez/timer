@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../hooks';
-import { next, previous } from './current-slice';
+import { next, previous } from '../app/current-slice';
 
 import Icons from '../utils/icons';
 

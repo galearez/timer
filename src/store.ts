@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import routineSlice from './app/routine-slice';
-import currentSlice from './countdown/current-slice';
+import currentSlice from './app/current-slice';
 import mountCountdownSlice from './app/mount-countdown-slice';
 
 const store = configureStore({
