@@ -2,15 +2,10 @@ import { useContext, useEffect } from 'react';
 import { RestContext } from '../../app';
 import TimeOptions from '../time-buttons';
 import { TimeContext } from '../../app/time-context';
-
-type DefaultTimeOptions = '0' | '5' | '10' | '20' | '30' | '45' | '60' | '180';
-
-interface RestContextTypes {
-  active: boolean;
-  time: DefaultTimeOptions;
-  setActive: (v: boolean) => void;
-  setTime: (t: DefaultTimeOptions) => void;
-}
+import type {
+  DefaultTimeOptions,
+  RestContextTypes,
+} from '../../@types/context';
 
 export default function GlobalRestForm() {
   // this context will hold the state of the global rest form and the rest time

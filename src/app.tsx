@@ -7,15 +7,12 @@ import ActivitiesList from './components/activities-list';
 import NextActivity from './components/next-activity/next-activity';
 import NavBar from './components/navbar';
 import clsx from 'clsx';
-
-type DefaultTimeOptions = '0' | '5' | '10' | '20' | '30' | '45' | '60' | '180';
-
-interface RestContextTypes {
-  active: boolean;
-  time: DefaultTimeOptions;
-  setActive: (v: boolean) => void;
-  setTime: (t: DefaultTimeOptions) => void;
-}
+import type {
+  DefaultTimeOptions,
+  RestContextTypes,
+  ViewContextTypes,
+  ViewsType,
+} from './@types/context';
 
 // this context will pass the control of the rest states to the global rest component
 export const RestContext = React.createContext<RestContextTypes | null>(null);
@@ -25,13 +22,6 @@ export const GlobalRestContext = React.createContext<{
   active: boolean;
   time: DefaultTimeOptions;
 } | null>(null);
-
-type ViewsType = 'home' | 'countdown';
-
-interface ViewContextTypes {
-  current: ViewsType;
-  set: (s: ViewsType) => void;
-}
 
 export const ViewContext = React.createContext<ViewContextTypes | null>(null);
 
