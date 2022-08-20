@@ -1,3 +1,4 @@
+import React from 'react';
 import { useAppDispatch } from '../../hooks';
 import { removeRound } from '../../app/routine-slice';
 import Icons from '../../utils/icons';
@@ -49,7 +50,8 @@ function RenderActivity(props: RenderActivityProps) {
           className='inline-block ml-3'
           onClick={() => {
             handleDeleteRound(activity.id);
-          }}>
+          }}
+        >
           <Icons value={'delete'} />
         </span>
       </div>

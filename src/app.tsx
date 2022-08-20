@@ -27,20 +27,20 @@ export const ViewContext = React.createContext<ViewContextTypes | null>(null);
 
 // this component will handle the user input and will pass main data, rounds (id, label and time)
 // to the other components
-export default function App() {
-  let [screenWidth, setScreenWidth] = useState(window.innerWidth);
+export default function App(): JSX.Element {
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
 
   // these are global states controlled by redux
-  let routine = useAppSelector((state) => state.routine.value);
-  let currentActivity = useAppSelector((state) => state.current.value);
-  let mountCountdown = useAppSelector((state) => state.mountCountdown.value);
+  const routine = useAppSelector((state) => state.routine.value);
+  const currentActivity = useAppSelector((state) => state.current.value);
+  const mountCountdown = useAppSelector((state) => state.mountCountdown.value);
   // these states control when the user selects to add a rest after each avtivity
-  let [restActive, setRestActive] = useState(false);
-  let [restTime, setRestTime] = useState<DefaultTimeOptions>('0');
+  const [restActive, setRestActive] = useState(false);
+  const [restTime, setRestTime] = useState<DefaultTimeOptions>('0');
   // this state is a boolean becuase is used to show the main input form based on the viewport size
-  let [addRoundFormActive, setAddRoundFormActive] = useState(false);
+  const [addRoundFormActive, setAddRoundFormActive] = useState(false);
   // this state is meant to unmount the home UI and mount/unmount the countdown component
-  let [view, setView] = useState<ViewsType>('home');
+  const [view, setView] = useState<ViewsType>('home');
 
   useEffect(() => {
     window.addEventListener('resize', () => setScreenWidth(window.innerWidth));
@@ -78,7 +78,8 @@ export default function App() {
         className={clsx(
           'flex flex-col justify-between',
           view === 'countdown' ? 'h-screen' : 'h-auto'
-        )}>
+        )}
+      >
         <ViewContext.Provider value={{ current: view, set: setView }}>
           <NavBar />
         </ViewContext.Provider>
@@ -89,7 +90,8 @@ export default function App() {
               time: restTime,
               setActive: setRestActive,
               setTime: setRestTime,
-            }}>
+            }}
+          >
             <GlobalRestForm />
           </RestContext.Provider>
         )}
@@ -100,7 +102,8 @@ export default function App() {
               className='font-bold block md:hidden w-3/5 text-white py-2 px-4 m-auto rounded-md bg-gray-600'
               onClick={() => {
                 setAddRoundFormActive(!addRoundFormActive);
-              }}>
+              }}
+            >
               New Round
             </button>
           </div>
@@ -110,7 +113,8 @@ export default function App() {
             value={{
               active: restActive,
               time: restTime,
-            }}>
+            }}
+          >
             <AddNewRound closeActivityForm={closeActivityFormCallback} />
           </GlobalRestContext.Provider>
         )}

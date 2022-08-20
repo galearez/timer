@@ -7,25 +7,25 @@ import TimerControls from './timer-controls';
 export default function Countdown() {
   const dispatch = useAppDispatch();
   const routine = useAppSelector((state) => state.routine.value);
-  let currentActivity = useAppSelector((state) => state.current.value);
+  const currentActivity = useAppSelector((state) => state.current.value);
 
   const time = routine ? routine[0].time : 0;
   const label = routine[currentActivity]?.label;
-  let [countdownTime, setCountdownTime] = useState(time);
-  let [minutes, setMinutes] = useState(Math.floor(time / 60));
-  let [seconds, setSeconds] = useState(time % 60);
+  const [countdownTime, setCountdownTime] = useState(time);
+  const [minutes, setMinutes] = useState(Math.floor(time / 60));
+  const [seconds, setSeconds] = useState(time % 60);
 
   // this class variable will hold the setInterval, their only purpose is to be able to clear the interval
-  let interval = useRef<number>();
+  const interval = useRef<number>();
   const ONE_SECOND = 1000;
-  let [expectedTime, setExpectedTime] = useState(Date.now() + ONE_SECOND);
-  let [intervalTime, setIntervalTime] = useState(ONE_SECOND);
+  const [expectedTime, setExpectedTime] = useState(Date.now() + ONE_SECOND);
+  const [intervalTime, setIntervalTime] = useState(ONE_SECOND);
 
   // once the component mounts it will start a countdown, the original value is the one passed as a prop to
   // the component and it will run until the 'countdownTime' is 0
   useEffect(() => {
     interval.current = window.setInterval(() => {
-      let drift = Date.now() - expectedTime;
+      const drift = Date.now() - expectedTime;
       if (drift > ONE_SECOND) {
         clearInterval(interval.current);
         return (

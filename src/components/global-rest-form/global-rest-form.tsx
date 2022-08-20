@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { RestContext } from '../../app';
 import TimeOptions from '../time-buttons';
 import { TimeContext } from '../../app/time-context';
@@ -10,7 +10,7 @@ import type {
 export default function GlobalRestForm() {
   // this context will hold the state of the global rest form and the rest time
   // also it will provide two callback to control the state from this component
-  let rest = useContext(RestContext) as RestContextTypes;
+  const rest = useContext(RestContext) as RestContextTypes;
 
   // this function will toggle the global rest form
   function toggleRadioFieldset() {
@@ -49,7 +49,8 @@ export default function GlobalRestForm() {
               value: rest.time,
               setValue: rest.setTime,
               dependent: false,
-            }}>
+            }}
+          >
             {timeOptions}
           </TimeContext.Provider>
         </fieldset>

@@ -21,7 +21,7 @@ const routineSlice = createSlice({
       state.value = [...state.value, action.payload];
     },
     removeRound(state, action: PayloadAction<string>) {
-      let match = state.value.filter((round) => round.id !== action.payload);
+      const match = state.value.filter((round) => round.id !== action.payload);
       state.value = match;
     },
   },

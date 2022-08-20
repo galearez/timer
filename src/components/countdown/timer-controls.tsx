@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../hooks';
 import { next, previous } from '../../app/current-slice';
 
@@ -14,13 +14,13 @@ interface ButtonControlsProps {
 
 export default function TimerControls(props: ButtonControlsProps) {
   const dispatch = useAppDispatch();
-  let currentActivity = useAppSelector((state) => state.current.value);
+  const currentActivity = useAppSelector((state) => state.current.value);
 
   // this enum will ensure the buttonState is a string of 3 possible values
   type ButtonDisable = 'left' | 'none' | 'right';
-  let [disableButton, setDisableButton] = useState<ButtonDisable>('left');
-  let disableAllMoveButtons = props.routineLength === 1;
-  let [isPaused, setIsPaused] = useState(false);
+  const [disableButton, setDisableButton] = useState<ButtonDisable>('left');
+  const disableAllMoveButtons = props.routineLength === 1;
+  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
     if (currentActivity === props.routineLength - 1)
@@ -45,7 +45,7 @@ export default function TimerControls(props: ButtonControlsProps) {
   // this function will restart the countdown
   function resumeCountdown() {
     setIsPaused(false);
-    let resume: number = window.setTimeout(() => {
+    const resume: number = window.setTimeout(() => {
       props.substractOneSecond();
       props.setExpectedTimeCallback();
       return clearTimeout(resume);
@@ -75,26 +75,30 @@ export default function TimerControls(props: ButtonControlsProps) {
         <button
           className='rounded-full w-12 h-12 bg-gray-700 disabled:bg-gray-900'
           disabled={disableButton === 'left'}
-          onClick={previousActivity}>
+          onClick={previousActivity}
+        >
           <Icons value={'previous'} disable={disableButton === 'left'} />
         </button>
       )}
 
       <button
         className='rounded-full w-14 h-14 bg-gray-700'
-        onClick={restartActivity}>
+        onClick={restartActivity}
+      >
         <Icons value={'replay'} />
       </button>
       {isPaused ? (
         <button
           className='rounded-full w-16 h-16 bg-mint'
-          onClick={resumeCountdown}>
+          onClick={resumeCountdown}
+        >
           <Icons value={'play'} />
         </button>
       ) : (
         <button
           className='rounded-full w-16 h-16 bg-gray-700'
-          onClick={stopCountdown}>
+          onClick={stopCountdown}
+        >
           <Icons value={'pause'} />
         </button>
       )}
@@ -102,7 +106,8 @@ export default function TimerControls(props: ButtonControlsProps) {
         <button
           className='rounded-full w-12 h-12 bg-gray-700 disabled:bg-gray-900'
           disabled={disableButton === 'right'}
-          onClick={nextActivity}>
+          onClick={nextActivity}
+        >
           <Icons value={'next'} disable={disableButton === 'right'} />
         </button>
       )}
