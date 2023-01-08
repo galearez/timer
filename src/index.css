@@ -65,4 +65,13 @@
     background-color: rgba(64, 64, 64, 0.5);
     @apply h-24 sm:h-12 w-11/12 sm:w-full sm:left-0;
   }
+  input[type='number']:disabled ~ .number {
+    color: white;
+    background-color: #737373;
+  }
+  .hide-arrows {
+    -webkit-appearance: none;
+    -moz-appearance: textfield;
+    margin: 0;
+  }
 }
