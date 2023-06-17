@@ -3,7 +3,6 @@ import { useAppSelector, useAppDispatch } from '../hooks';
 import { ViewContext } from '../App';
 import { mount } from '../app/mount-countdown-slice';
 import { restart } from '../countdown/current-slice';
-import Icons from '../utils/icons';
 
 export default function NavBar() {
   const dispatch = useAppDispatch();
@@ -28,7 +27,8 @@ export default function NavBar() {
         <button
           className='font-bold text-white py-2 px-4 rounded-md bg-gray-700'
           onClick={() => dispatch(restart())}>
-          Restart all <Icons value={'restore'} />
+          Restart all&nbsp;
+          <img src='restore.svg' className='inline-block' />
         </button>
       )}
     </nav>
