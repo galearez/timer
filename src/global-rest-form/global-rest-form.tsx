@@ -1,5 +1,5 @@
 import { useContext, useEffect } from 'react';
-import { RestContext } from '../app';
+import { RestContext } from '../App';
 import TimeOptions from '../time-buttons';
 import { TimeContext } from '../app/time-context';
 

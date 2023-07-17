@@ -1,6 +1,5 @@
 import { useAppDispatch } from '../hooks';
 import { removeRound } from '../app/routine-slice';
-import Icons from '../utils/icons';
 
 interface Activities {
   id: string;
@@ -50,7 +49,7 @@ function RenderActivity(props: RenderActivityProps) {
           onClick={() => {
             handleDeleteRound(activity.id);
           }}>
-          <Icons value={'delete'} />
+          <img src='delete.svg' className='inline-block' />
         </span>
       </div>
     </div>

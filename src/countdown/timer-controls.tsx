@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../hooks';
 import { next, previous } from './current-slice';
-
-import Icons from '../utils/icons';
+import clsx from 'clsx';
 
 interface ButtonControlsProps {
   routineLength: number;
@@ -76,26 +75,26 @@ export default function TimerControls(props: ButtonControlsProps) {
           className='rounded-full w-12 h-12 bg-gray-700 disabled:bg-gray-900'
           disabled={disableButton === 'left'}
           onClick={previousActivity}>
-          <Icons value={'previous'} disable={disableButton === 'left'} />
+          <img src='previous.svg' className={clsx('inline-block', disableButton === 'left' && 'opacity-60')} />
         </button>
       )}
 
       <button
         className='rounded-full w-14 h-14 bg-gray-700'
         onClick={restartActivity}>
-        <Icons value={'replay'} />
+        <img src='replay.svg' className='inline-block' />
       </button>
       {isPaused ? (
         <button
           className='rounded-full w-16 h-16 bg-mint'
           onClick={resumeCountdown}>
-          <Icons value={'play'} />
+          <img src='play.svg' className='inline-block' />
         </button>
       ) : (
         <button
           className='rounded-full w-16 h-16 bg-gray-700'
           onClick={stopCountdown}>
-          <Icons value={'pause'} />
+          <img src='pause.svg' className='inline-block' />
         </button>
       )}
       {!disableAllMoveButtons && (
@@ -103,7 +102,7 @@ export default function TimerControls(props: ButtonControlsProps) {
           className='rounded-full w-12 h-12 bg-gray-700 disabled:bg-gray-900'
           disabled={disableButton === 'right'}
           onClick={nextActivity}>
-          <Icons value={'next'} disable={disableButton === 'right'} />
+          <img src='next.svg' className={clsx('inline-block', disableButton === 'right' && 'opacity-60')}/>
         </button>
       )}
     </div>

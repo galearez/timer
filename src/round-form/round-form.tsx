@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useRef, useState } from 'react';
 import { useAppDispatch } from '../hooks';
 import { addRound } from '../app/routine-slice';
 import { v4 as uuidv4 } from 'uuid';
-import { GlobalRestContext } from '../app';
+import { GlobalRestContext } from '../App';
 import TimeButtons from '../time-buttons';
 import { TimeContext } from '../app/time-context';
 
